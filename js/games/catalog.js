@@ -116,7 +116,7 @@ export const GAMES = [
   {
     id: 'symbol-cipher', title: 'Glyph Cipher', cat: 'speed', icon: '🔣', par: 150,
     blurb: 'Decode glyphs into digits using the key.',
-    twist: 'Every so often the key flips face-down and you have to decode from memory.',
+    twist: 'Every so often the key flips face-down and you have to decode from memory. Answers given while it is hidden score double.',
     howto: ['Find the glyph in the key.', 'Tap its digit.', 'When the key hides, rely on memory.'],
   },
   {
@@ -148,7 +148,7 @@ export const GAMES = [
     id: 'mirror-bounce', title: 'Laser Mirrors', cat: 'spatial', icon: '🔦', par: 100,
     blurb: 'Predict where the laser exits the mirror maze.',
     twist: 'The mirrors only show for a few seconds, so you have to trace the beam from memory.',
-    howto: ['Memorise the mirrors.', 'They vanish and the laser fires.', 'Tap the edge where the beam leaves.'],
+    howto: ['Memorise the mirrors.', 'They vanish and the laser fires.', 'Tap the edge port where the beam leaves.'],
   },
   // ── Logic & Language ───────────────────────────────────────────
   {
