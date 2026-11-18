@@ -307,6 +307,11 @@ function render() {
 window.addEventListener('hashchange', render);
 render();
 
+// Offline support (skipped on localhost so development always sees fresh files).
+if ('serviceWorker' in navigator && !/^(localhost|127\.)/.test(location.hostname)) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
 // Decorative three.js background, loaded after first paint and only on capable devices.
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const start = () => import('./bg.js').then((m) => m.startBackground(document.getElementById('bg'))).catch(() => {});

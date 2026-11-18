@@ -129,7 +129,7 @@ export const GAMES = [
   {
     id: 'cube-count', title: 'Cube Stack 3D', cat: 'spatial', icon: '🧊', par: 100, three: true,
     blurb: 'Count every cube in a rotating 3D stack.',
-    twist: 'Cubes can\'t float, so hidden cubes under the visible ones count too. Later stacks ask for one colour only.',
+    twist: 'Cubes can\'t float, so hidden cubes under the visible ones count too. Later stacks ask about one colour only, and each column is a single colour.',
     howto: ['Watch the stack rotate.', 'Count the cubes, hidden supports included.', 'Type your count.'],
   },
   {
