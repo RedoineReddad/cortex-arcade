@@ -77,31 +77,31 @@ export const GAMES = [
   },
   // ── Attention ──────────────────────────────────────────────────
   {
-    id: 'color-clash', title: 'Color Clash', cat: 'attention', icon: '🎨', par: 160,
+    id: 'color-clash', title: 'Color Clash', cat: 'attention', icon: '🎨', par: 320,
     blurb: 'A colour word printed in a different ink colour.',
     twist: 'The frame tells you which to answer: solid means the ink colour, dashed means the word.',
-    howto: ['Solid frame → tap the INK colour.', 'Dashed frame → tap what the WORD says.', 'Go fast, but mistakes cost points.'],
+    howto: ['Solid frame → tap the INK colour.', 'Dashed frame → tap what the WORD says.', 'Go fast, but mistakes cost points. Keys 1–6 work too.'],
   },
   {
-    id: 'flock-flanker', title: 'Flock Focus', cat: 'attention', icon: '🐦', par: 160,
+    id: 'flock-flanker', title: 'Flock Focus', cat: 'attention', icon: '🐦', par: 380,
     blurb: 'Which way is the lead bird pointing?',
     twist: 'At dusk (orange sky), ignore the birds and answer which way the whole flock is drifting.',
     howto: ['Day: answer the CENTRE bird\'s direction.', 'Dusk: answer the direction the flock MOVES.', 'Use arrow keys or the buttons.'],
   },
   {
-    id: 'orbit-track', title: 'Orbit Tracker', cat: 'attention', icon: '🪐', par: 100,
+    id: 'orbit-track', title: 'Orbit Tracker', cat: 'attention', icon: '🪐', par: 150,
     blurb: 'Keep your eyes on the marked orbs as they swirl.',
     twist: 'Orbs vanish while they cross the fog bands, so you have to keep tracking them blind.',
     howto: ['Remember the highlighted orbs.', 'They all look the same as they move.', 'Tap the ones you tracked when they stop.'],
   },
   {
-    id: 'shape-back', title: 'Shape Back', cat: 'attention', icon: '⏪', par: 140,
+    id: 'shape-back', title: 'Shape Back', cat: 'attention', icon: '⏪', par: 260,
     blurb: 'Does this card match the one before?',
     twist: 'The cue keeps changing what counts as a match: SHAPE on some cards, COLOUR on others.',
     howto: ['Compare each card with the one N cards back.', 'Check the cue: shape or colour?', 'Tap Match or No match.'],
   },
   {
-    id: 'signal-sprint', title: 'Signal Sprint', cat: 'attention', icon: '🚦', par: 150,
+    id: 'signal-sprint', title: 'Signal Sprint', cat: 'attention', icon: '🚦', par: 240,
     blurb: 'Tap the green signals fast and leave the red ones alone.',
     twist: 'When the screen turns purple the rule flips: tap red and leave green alone.',
     howto: ['Normally: tap GREEN, ignore RED.', 'Purple screen: tap RED, ignore GREEN.', 'Speed counts.'],
