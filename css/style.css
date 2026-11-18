@@ -238,3 +238,7 @@ button.chip { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) #bg { filter: saturate(1.4); opacity: 0.55; }
+}
+#bg.off { opacity: 0 !important; }

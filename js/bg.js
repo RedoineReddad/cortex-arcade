@@ -18,7 +18,18 @@ export async function startBackground(canvas) {
   }
   const pGeo = new THREE.BufferGeometry();
   pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x8b9cff, size: 0.18, transparent: true, opacity: 0.8 }));
+  const dot = document.createElement('canvas');
+  dot.width = dot.height = 32;
+  const g = dot.getContext('2d');
+  const grad = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.4, 'rgba(255,255,255,0.8)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 32, 32);
+  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({
+    color: 0x8b9cff, size: 0.35, map: new THREE.CanvasTexture(dot), transparent: true, opacity: 0.9, depthWrite: false,
+  }));
   scene.add(points);
 
   const MAXL = 400;
@@ -47,7 +58,7 @@ export async function startBackground(canvas) {
     last = now;
     const view = document.body.dataset.view;
     const inGame = !!document.querySelector('.stage');
-    canvas.style.opacity = inGame ? '0' : '1';
+    canvas.classList.toggle('off', inGame);
     if (inGame || document.hidden) return;
     for (let i = 0; i < N; i++) {
       const v = vel[i];
