@@ -1,5 +1,7 @@
 # 🧠 Cortex Arcade
 
+**▶ Play it: https://redoinereddad.github.io/cortex-arcade/**
+
 **25 brain-training mini games that run in the browser.** Inspired by the daily-check format of
 Dr Kawashima's *Brain Training* and the skill-area approach of Lumosity. Every game takes a known
 cognitive-training idea (Stroop, n-back, Trail Making, multiple-object tracking, mental rotation,
