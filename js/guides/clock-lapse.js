@@ -24,6 +24,7 @@ const STYLE = `
   .clg-hh { stroke: var(--ink); stroke-width: 4.6; stroke-linecap: round; }
   .clg-mh { stroke: var(--c); stroke-width: 2.8; stroke-linecap: round; }
   .clg-pin { fill: var(--ink); }
+  .clg-clock { flex-shrink: 0; display: block; }
   .clg-mir { border-radius: 50%; box-shadow: 0 0 0 3px #7dd3fc; display: block; }
   .clg-mir svg { display: block; transform: scaleX(-1); }
   .clg-turn svg { display: block; animation: clg-turn 3.2s ease-in-out infinite; }
@@ -65,7 +66,7 @@ export default {
       say: 'Here is the twist: a clock marked Mirror is seen in a mirror. Flip it left to right in your head before you read it.',
       demo: (h) => h('div.tut-row', h('style', STYLE),
         col(h, h('span.clg-badge', 'Mirror'), h('div.clg-mir', clock(h, 120))), h('span.tut-big', '→'),
-        col(h, 'flip it back', h('div.clg-turn', clock(h, 120))), h('span.tut-note', 'really 2:00')),
+        col(h, h('span.tut-note', 'really 2:00'), h('div.clg-turn', clock(h, 120)))),
     },
     {
       say: 'Tap your answer or press 1 to 4. Right answers score more when they are quick, wrong ones cost points.',

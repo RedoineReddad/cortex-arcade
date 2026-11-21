@@ -22,7 +22,8 @@ function box(h, { mirrors = [], hide, emit, beam, exit, tap }) {
 }
 
 const STYLE = `
-  .mbg-svg { width: 150px; height: 150px; overflow: visible; }
+  .mbg-svg { width: clamp(110px, 30vw, 150px); height: clamp(110px, 30vw, 150px); overflow: visible; }
+  .mbg-rule { font-size: .85rem; }
   .mbg-cell { fill: var(--sheet); stroke: var(--edge); stroke-width: .03; }
   .mbg-port { fill: none; stroke: var(--edge); stroke-width: .05; stroke-dasharray: .1 .08; }
   .mbg-port.mbg-emit { fill: var(--c); stroke: var(--c); stroke-dasharray: none; }
@@ -67,7 +68,7 @@ export default {
       say: 'Each mirror turns the beam a quarter turn, like a ball bouncing off a slanted wall.',
       demo: (h) => h('div.tut-row', { style: { gap: '18px' } }, h('style', STYLE),
         box(h, { mirrors: M, emit: ['L', 1], exit: ['B', 0], beam: [[0.5, 2.5], [1.5, 2.5], [1.5, 4.5]] }),
-        h('div.tut-col', h('div.tut-box', '→ hits \\ → down'), h('div.tut-box', '→ hits / → up'))),
+        h('div.tut-col', h('div.tut-box.mbg-rule', '→ hits \\ → down'), h('div.tut-box.mbg-rule', '→ hits / → up'))),
     },
     {
       say: 'Tap the edge port where the beam leaves the box. More mirrors in the path means more points.',
