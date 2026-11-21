@@ -352,3 +352,89 @@ button { font: inherit; color: inherit; }
 
 #main:focus { outline: none; }
 #main:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+/* ── Professor Gloop (js/teacher.js) ───────────────────────────────── */
+.teacher { --face: 1; pointer-events: none; z-index: 60; }
+.teacher-fixed { position: fixed; left: 0; top: 0; will-change: transform; }
+.teacher-inline { position: relative; width: 100%; height: 100%; }
+.teacher svg { width: 100%; height: 100%; overflow: visible; transform: scaleX(var(--face)); transition: transform 0.2s; }
+.teacher .t-shadow { fill: rgba(0, 0, 0, 0.18); }
+.teacher .t-skin { fill: #b9cf8e; }
+.teacher .t-stroke, .teacher .t-coat, .teacher .t-white, .teacher .t-snout, .teacher .t-foot, .teacher .t-pocket { stroke: #2a2f36; stroke-width: 2.4; stroke-linejoin: round; }
+.teacher .t-legs .t-skin { stroke: #b9cf8e; }
+.teacher .t-foot { fill: #8ea862; }
+.teacher .t-coat { fill: #fbfbf6; }
+.teacher .t-pocket { fill: #eef0ea; stroke-width: 1.6; }
+.teacher .t-line { stroke: #2a2f36; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.teacher .t-shirt { fill: #dfe8f2; }
+.teacher .t-tie { fill: #1e4bd7; }
+.teacher .t-snout { fill: #d4e3b1; stroke-width: 2; }
+.teacher .t-ink, .teacher .t-pupil { fill: #2a2f36; }
+.teacher .t-white { fill: #fff; }
+.teacher .t-glass { fill: none; stroke: #2a2f36; stroke-width: 2.6; }
+.teacher .t-bobble { fill: #ffad5c; stroke: #2a2f36; stroke-width: 2; }
+.teacher .t-teeth { fill: #fff; stroke: #2a2f36; stroke-width: 1.4; }
+.teacher .t-mouth-open { fill: #5a2230; stroke: #2a2f36; stroke-width: 2; opacity: 0; }
+.teacher .t-stick { stroke: #8a5a2b; stroke-width: 3.4; stroke-linecap: round; }
+.teacher .t-stick-tip { fill: #cc1f2a; }
+.teacher .t-arm { transition: transform 0.15s ease-out; }
+.teacher .t-antennae { transform-box: fill-box; transform-origin: 50% 100%; animation: t-wobble 2.6s ease-in-out infinite; }
+.teacher .t-head { transform-box: fill-box; transform-origin: 50% 100%; animation: t-nod 4s ease-in-out infinite; }
+.teacher.talking .t-mouth-open { animation: t-talk 0.22s steps(2) infinite; }
+.teacher.talking .t-mouth-shut { opacity: 0; }
+.teacher.talking .t-mouth-open { opacity: 1; }
+.teacher.peek .teacher-bubble { display: none; }
+
+.teacher-bubble {
+  pointer-events: auto; cursor: pointer; position: absolute; bottom: 100%; left: 50%;
+  width: max-content; max-width: min(300px, 70vw); margin-bottom: 6px; transform: translateX(-50%);
+  padding: 10px 14px; background: var(--sheet); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--r2);
+  font-size: 0.95rem; line-height: 1.35; box-shadow: var(--shadow);
+}
+.teacher-bubble::after {
+  content: ""; position: absolute; top: 100%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  background: var(--sheet); border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg);
+}
+.teacher-bubble.pop { animation: bannerPopSmall 0.25s ease-out; }
+@keyframes bannerPopSmall { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes t-wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
+@keyframes t-nod { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-2deg); } }
+@keyframes t-talk { to { transform: scaleY(0.4); } }
+@media (prefers-reduced-motion: reduce) { .teacher .t-antennae, .teacher .t-head { animation: none; } }
+
+/* ── Tutorial dialog ───────────────────────────────────────────────── */
+.tut { width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 1px solid var(--edge); border-radius: var(--r2); background: var(--sheet); color: var(--ink); box-shadow: var(--shadow); overflow: auto; }
+.tut::backdrop { background: rgba(11, 15, 13, 0.55); }
+.tut-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 0 20px; }
+.tut-head h2 { margin: 0; font-size: 1.25rem; }
+.tut-stage { position: relative; margin: 12px 16px 0; height: 210px; border: 1px solid var(--edge); border-radius: var(--r1); overflow: hidden; display: grid; place-items: center; }
+.tut-talk { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: end; padding: 12px 16px 0; }
+.tut-prof { height: 118px; }
+.tut-say { position: relative; margin-bottom: 26px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: var(--r2); background: var(--sheet); min-height: 3.2em; }
+.tut-say::before { content: ""; position: absolute; left: -8px; bottom: 14px; width: 12px; height: 12px; background: var(--sheet); border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); }
+.tut-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 16px 16px; flex-wrap: wrap; }
+.tut-dots { display: flex; gap: 6px; }
+.tut-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
+.tut-dots i.on { background: var(--ink); }
+.tut-nav { display: flex; gap: 8px; margin-left: auto; }
+
+/* Building blocks for tutorial demos (js/guides/*.js) */
+.tut-row { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.tut-col { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.tut-box { min-width: 44px; height: 44px; padding: 0 10px; display: grid; place-items: center; border: 2px solid var(--edge); border-radius: var(--r1); background: var(--sheet); font-weight: 700; font-size: 1.1rem; }
+.tut-box.on { background: var(--c); color: var(--c-ink); border-color: var(--c); }
+.tut-box.good { border-color: var(--good); color: var(--good); }
+.tut-box.bad { border-color: var(--pen); color: var(--pen); }
+.tut-big { font-size: 2rem; font-weight: 700; }
+.tut-note { font-family: var(--hand); color: var(--pen); font-size: 1.2rem; }
+.tut-muted { color: var(--ink-soft); font-size: 0.9rem; }
+.tut-tap { position: relative; }
+.tut-tap::after { /* a pulsing "tap here" ring */
+  content: ""; position: absolute; inset: -6px; border: 3px solid var(--pen); border-radius: 50%; animation: tut-ping 1.4s ease-out infinite;
+}
+.tut-blink { animation: tut-blink 1.6s ease-in-out infinite; }
+@keyframes tut-ping { from { transform: scale(0.7); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+@keyframes tut-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@media (max-width: 480px) { .tut-stage { height: 180px; } .tut-talk { grid-template-columns: 64px 1fr; } .tut-prof { height: 90px; } }
+
+.intro-actions { margin-top: 0; }

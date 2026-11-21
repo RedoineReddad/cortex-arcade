@@ -4,6 +4,11 @@ import { createApi } from './core/api.js';
 import { sfx, isMuted, setMuted } from './core/audio.js';
 import * as store from './core/storage.js';
 import { GAMES, CATEGORIES, byId } from './games/catalog.js';
+import { createTeacher } from './teacher.js';
+import { loadGuide, pickTip, openTutorial } from './tutorial.js';
+
+const prof = createTeacher().mount();
+window.__prof = prof; // for tests
 
 const app = document.getElementById('app');
 let current = null; // running game api
@@ -137,12 +142,19 @@ function viewIntro(g, { onStart, back = '#/', step } = {}) {
       h('div.meta',
         h('span', 'Level ', h('b', lvl), ' of 5'),
         h('span', b != null ? ['Your best ', h('b', b)] : 'First attempt')),
-      h('button.btn.primary.big', { type: 'button', onclick: onStart }, 'Start')));
+      h('div.actions.intro-actions',
+        h('button.btn.primary.big', { type: 'button', onclick: onStart }, 'Start'),
+        h('button.btn.ghost.big.tut-open', { type: 'button', onclick: () => { prof.hush(); openTutorial(g, onStart); } }, 'How to play'))));
   focusMain(app.querySelector('.btn.big'));
+  loadGuide(g.id); // warm the cache
+  if (b == null) {
+    prof.say('New one! Press “How to play” and I will show you how it works.', { point: app.querySelector('.tut-open'), ms: 6000 });
+  } else prof.hush();
 }
 
 async function runGame(g, { back = '#/', step, onDone } = {}) {
   abortCurrent();
+  prof.hush();
   const hud = {
     timeWrap: h('div.hud-time', { hidden: true, 'aria-label': 'Time' }),
     time: h('span'),
@@ -226,6 +238,14 @@ function viewResult(g, res, back = '#/') {
         h('button.btn.primary', { type: 'button', onclick: () => runGame(g, { back }) }, 'Play again'),
         h('a.btn.ghost', { href: '#/play/' + next.id }, 'Next: ' + next.title))));
   focusMain(app.querySelector('.btn.primary'));
+  giveTip(g, res);
+}
+
+function giveTip(g, res) {
+  loadGuide(g.id).then((guide) => {
+    const mark = app.querySelector('.result-score .graded');
+    if (mark) prof.say(pickTip(guide, res.rating), { point: mark });
+  });
 }
 
 function viewDaily() {
@@ -251,6 +271,7 @@ function viewDaily() {
         scoreBlock(r),
         h('div.actions', h('button.btn.primary.big', { type: 'button', onclick: () => step(i + 1) }, last ? 'See my brain age' : 'Next exercise'))));
     focusMain(app.querySelector('.btn.primary'));
+    giveTip(r.g, r);
   };
   const finish = () => {
     const avg = results.reduce((a, r) => a + r.rating, 0) / results.length;
@@ -336,6 +357,7 @@ function viewStats() {
 // ─── Router ────────────────────────────────────────────────────────────────
 function render() {
   abortCurrent();
+  prof.hush();
   const hash = location.hash || '#/';
   const [, route, arg] = hash.split('/');
   window.scrollTo(0, 0);
