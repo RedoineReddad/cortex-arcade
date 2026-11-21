@@ -39,7 +39,7 @@ export function levelFor(g) {
   const p = playsOf(g).slice(-3);
   if (!p.length) return 1;
   const avg = p.reduce((a, x) => a + x.r, 0) / p.length;
-  return Math.max(1, Math.min(5, 1 + Math.floor(avg / 22)));
+  return Math.max(1, Math.min(5, 1 + Math.floor(avg / 25))); // 0-24 → 1, 25-49 → 2, 50-74 → 3, 75-99 → 4, par+ → 5
 }
 
 export function getDaily(day = todayKey()) { return mem.daily[day] || null; }

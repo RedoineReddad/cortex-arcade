@@ -11,6 +11,8 @@ digit-symbol coding and so on) and adds **an original twist**.
 * **Drill-book design:** white graph-paper sheets on a grey desk by day, a chalkboard at night. The teacher's red pen marks your scores. Colours are documented and contrast-checked in [docs/DESIGN.md](docs/DESIGN.md). Type is Atkinson Hyperlegible, with Kalam for the pen; both are self-hosted.
 * **three.js** (r170, bundled with the app and loaded only when needed) runs the two 3D spatial games.
 * **Daily Brain Check:** three games picked for the day give an estimated *brain age* (20–80, lower is better).
+* **Professor Gloop:** a goofy, sloth-ish alien teacher in a lab coat who follows your pointer, points with his stick and gives a tip for that game after every round.
+* **How to play:** every game has a short illustrated tutorial next to its Start button.
 * **Adaptive difficulty:** each game has 5 levels, adjusted from your recent ratings.
 * **Progress:** a skill-profile radar across 6 areas, a brain-age trend, personal bests and a day streak, all stored locally.
 * Works with mouse, touch and keyboard, on phone and desktop, in light and dark mode, and offline (service worker).
@@ -95,6 +97,9 @@ js/core/storage.js      plays, bests, adaptive levels, streak (localStorage)
 js/core/audio.js        tiny WebAudio synth (no sound files)
 js/games/catalog.js     metadata for every game
 js/games/<id>.js        one module per game
+js/guides/<id>.js       tutorial steps and the professor's tips for each game
+js/teacher.js           Professor Gloop (SVG character)
+js/tutorial.js          How to play dialog and tip picker
 vendor/                 three.js r170 (MIT)
 fonts/                  Atkinson Hyperlegible + Kalam (OFL)
 sw.js                   offline cache
