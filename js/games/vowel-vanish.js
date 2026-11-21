@@ -66,6 +66,8 @@ export default function start(api) {
     .vv-v:hover { border-color:var(--c); }
     .vv-v:active { transform:scale(.94); }
     .vv-opts .choice { font-size:clamp(1.05rem,4.4vw,1.35rem); letter-spacing:.06em; }
+    .vv-opts .choice { position:relative; }
+    .vv-opts .choice kbd { position:absolute; top:6px; left:9px; font:600 .7rem system-ui; letter-spacing:0; color:var(--muted); }
     .vv-msg { min-height:1.3em; color:var(--muted); font-size:.95rem; }
     @keyframes vv-blink { to { box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 12%,transparent); } }
     @keyframes vv-pop { from { transform:scale(1.25); } }
@@ -111,7 +113,7 @@ export default function start(api) {
       board.textContent = word.sk;
       const opts = shuffle([word, ...distractors(word)]);
       word.opts = opts;
-      controls.replaceChildren(h('div.choices.vv-opts', opts.map((o, i) => h('button.choice', { type: 'button', onclick: (e) => choose(i, e) }, o.w))));
+      controls.replaceChildren(h('div.choices.vv-opts', opts.map((o, i) => h('button.choice', { type: 'button', onclick: (e) => choose(i, e) }, h('kbd', String(i + 1)), o.w))));
       api.setInfo('Pick the word');
     }
   }
@@ -143,7 +145,8 @@ export default function start(api) {
       tile.classList.remove('err'); void tile.offsetWidth; tile.classList.add('err');
       if (missesHere >= 3) { // help out after three misses on the same gap
         msg.textContent = 'It was ' + vowelsOf[filled];
-        api.after(10, () => press(vowelsOf[filled]));
+        locked = true; // ignore further taps until the hint is filled in, so it can't fill two gaps
+        api.after(250, () => { locked = false; press(vowelsOf[filled]); });
       }
     }
   }

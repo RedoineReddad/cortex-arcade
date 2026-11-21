@@ -134,6 +134,7 @@ export default function start(api) {
   }
 
   function submit(v) {
+    if (lives <= 0) return; // the round is over; finish() runs shortly
     const hits = drops.filter((d) => !d.gone && d.req === v);
     if (!hits.length) {
       wrong++; combo = 0; comboEl.classList.remove('on');
@@ -179,7 +180,7 @@ export default function start(api) {
       if (d.gone) continue;
       d.y += d.v * dt;
       const dh = d.el.offsetHeight || 44;
-      d.el.style.translate = `-50% ${12 + d.y * (H - dh - 22)}px`; // `translate` (not transform) so the scale animations stay in place
+      d.el.style.translate = `-50% ${40 + d.y * (H - dh - 50)}px`; // start below the hearts/combo line // `translate` (not transform) so the scale animations stay in place
       if (d.y > 0.8) d.el.classList.add('low');
       if (d.y >= 1) {
         missed++; lives--; combo = 0; comboEl.classList.remove('on');

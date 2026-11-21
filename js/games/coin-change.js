@@ -56,7 +56,7 @@ export default function start(api) {
     .cc2-tray.no { border-color: var(--bad); border-style: solid; background: color-mix(in srgb, var(--bad) 12%, transparent); }
     .cc2-tray-head { display: flex; justify-content: space-between; font-weight: 700; color: var(--muted); font-size: .9rem; }
     .cc2-tray-head b { color: var(--text); font-variant-numeric: tabular-nums; font-size: 1.05rem; }
-    .cc2-tray-coins { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 52px; --k: .8; }
+    .cc2-tray-coins { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 52px; --k: 1.1; } /* smallest tray coin stays a 44px tap target */
     .cc2-empty { color: var(--muted); font-size: .9rem; margin: auto; }
     .cc2-answer { font-size: .9rem; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; --k: .62; }
     .cc2-till { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 6px; justify-items: center; align-items: center; padding: 6px 0; --k: 1.12; }
@@ -83,7 +83,7 @@ export default function start(api) {
     .cc2-tray-coins .cc2-coin { animation: pop .2s ease-out; }
     .cc2-btns { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
     .cc2-btns .btn { padding: 14px; font-size: 1.05rem; }
-    @media (max-height: 740px) { .cc2-till { --k: .95; gap: 6px; } .cc2-slot { min-height: 64px; } .cc2-tray { min-height: 96px; } }
+    @media (max-height: 740px) { .cc2-till { --k: 1.1; gap: 4px; } .cc2-slot { min-height: 64px; } .cc2-tray { min-height: 96px; } }
   `);
 
   const priceEl = h('b'), noteEl = h('div.cc2-note'), sumEl = h('b', '€0.00');

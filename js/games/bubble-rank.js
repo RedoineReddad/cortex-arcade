@@ -41,12 +41,12 @@ export default function start(api) {
   let W = 300, H = 300, now = 0;
 
   api.css(`
-    .br-head { display: flex; align-items: center; gap: 12px; width: min(560px, 100%); }
+    .br-head { display: flex; align-items: center; gap: 12px; width: min(760px, 100%); } /* same width as the arena */
     .br-dir {
       display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px; font-weight: 800;
       background: color-mix(in srgb, var(--br) 18%, var(--panel-solid)); border: 2px solid var(--br); white-space: nowrap; transition: all .3s;
     }
-    .br-dir i { font-style: normal; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--br); color: #fff; font-size: 1.2rem; }
+    .br-dir i { font-style: normal; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--br); color: var(--c-ink); font-size: 1.2rem; }
     .br-trail { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; justify-content: flex-end; min-height: 28px; align-items: center; }
     .br-trail span { padding: 2px 9px; border-radius: 99px; font-weight: 800; font-size: .9rem; background: color-mix(in srgb, var(--br) 22%, transparent); animation: pop .25s ease-out; }
     .br-arena {

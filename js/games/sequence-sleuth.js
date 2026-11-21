@@ -113,9 +113,9 @@ export default function start(api) {
 
   api.css(`
     .ps-wrap { display:flex; flex-direction:column; align-items:center; gap:clamp(14px,3vh,28px); width:100%; max-width:720px; }
-    .ps-seq { display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(6px,1.4vw,12px); }
-    .ps-term { min-width:clamp(52px,13vw,84px); padding:clamp(10px,2vh,16px) 10px; border-radius:16px; text-align:center;
-      background:var(--panel-solid); border:2px solid var(--line); font-size:clamp(1.35rem,5.4vw,2.2rem); font-weight:800;
+    .ps-seq { display:flex; flex-wrap:nowrap; justify-content:center; gap:clamp(4px,1.4vw,12px); width:100%; }
+    .ps-term { flex:0 1 84px; min-width:0; padding:clamp(10px,2vh,16px) 2px; border-radius:16px; text-align:center;
+      background:var(--panel-solid); border:2px solid var(--line); font-size:clamp(1.1rem,4.8vw,2.2rem); font-weight:800;
       font-variant-numeric:tabular-nums; animation:ps-in .35s both; }
     .ps-term.alt { border-color:color-mix(in srgb,var(--c) 45%,var(--line)); background:color-mix(in srgb,var(--c) 10%,var(--panel-solid)); }
     .ps-term.q { border-style:dashed; border-color:var(--c); color:var(--c); }

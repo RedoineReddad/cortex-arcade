@@ -44,7 +44,7 @@ export default function start(api) {
     .mb-board { position:relative; width:min(100%,520px,calc(100dvh - 300px)); min-width:260px; aspect-ratio:1; }
     .mb-grid { display:grid; width:100%; height:100%; gap:0; }
     .mb-cell { margin:1.5px; border-radius:6px; background:color-mix(in srgb,var(--bg2) 85%,transparent); border:1px solid var(--line); }
-    .mb-port { border-radius:50%; border:2px dashed var(--line); background:transparent; padding:0; margin:20%; cursor:default; display:grid; place-items:center;
+    .mb-port { border-radius:50%; border:2px dashed var(--line); background:transparent; padding:0; margin:7%; cursor:default; display:grid; place-items:center;
       font-weight:900; font-size:clamp(.9rem,3.6vw,1.3rem); color:var(--c); transition:transform .1s, background .15s, border-color .15s; }
     .mb-board.mb-live .mb-port:not(.mb-emit) { cursor:pointer; border-style:solid; border-color:color-mix(in srgb,var(--c) 55%,var(--line)); background:var(--panel-solid); }
     .mb-board.mb-live .mb-port:not(.mb-emit):hover { background:color-mix(in srgb,var(--c) 25%,var(--panel-solid)); transform:scale(1.12); }

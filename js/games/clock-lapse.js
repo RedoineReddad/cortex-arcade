@@ -31,8 +31,8 @@ export default function start(api) {
     .cl2-face.cl2-mir::after { content:''; position:absolute; inset:3%; border-radius:50%; pointer-events:none;
       background:linear-gradient(115deg, transparent 30%, rgba(180,220,255,.28) 42%, transparent 48%, transparent 58%, rgba(180,220,255,.18) 64%, transparent 72%); }
     .cl2-face.cl2-mir { box-shadow:0 0 0 4px color-mix(in srgb, #7dd3fc 55%, transparent), 0 0 18px color-mix(in srgb, #7dd3fc 40%, transparent); }
-    .cl2-badge { position:absolute; top:-4px; right:-4px; font-size:1.5rem; background:var(--panel-solid); border:2px solid #7dd3fc; border-radius:50%;
-      width:2.1rem; height:2.1rem; display:grid; place-items:center; z-index:2; }
+    .cl2-label { display:flex; align-items:center; gap:6px; min-height:1.6rem; }
+    .cl2-badge { font-size:.72rem; letter-spacing:.04em; color:var(--text); background:var(--panel-solid); border:2px solid #7dd3fc; border-radius:99px; padding:1px 8px; }
     .cl2-rim { fill:var(--panel-solid); stroke:var(--c); stroke-width:3; }
     .cl2-tick { stroke:var(--muted); stroke-width:1; stroke-linecap:round; }
     .cl2-tick.cl2-hr { stroke:var(--text); stroke-width:2.4; }
@@ -126,9 +126,9 @@ export default function start(api) {
   }
 
   function face(label, t, mir) {
-    const f = h('div.cl2-face' + (mir ? '.cl2-mir' : ''), clockSvg(t), mir ? h('div.cl2-badge', { title: 'Mirror' }, '🪞') : null);
+    const f = h('div.cl2-face' + (mir ? '.cl2-mir' : ''), clockSvg(t));
     const truth = h('div.cl2-true', ' ');
-    return { el: h('div.cl2-col', h('div.cl2-label', label), f, truth), truth };
+    return { el: h('div.cl2-col', h('div.cl2-label', label, mir ? h('span.cl2-badge', 'Mirror') : null), f, truth), truth };
   }
 
   function next() {
@@ -140,7 +140,7 @@ export default function start(api) {
     choices.replaceChildren(...cur.options.map((v, i) => h('button.choice', { type: 'button', 'data-v': v, onclick: (e) => answer(v, e.currentTarget) }, h('small', { style: { opacity: 0.5, marginRight: '6px' } }, i + 1), fmtDur(v))));
     locked = false;
     t0 = performance.now();
-    api.setInfo(`Q${n + 1}` + (cur.mirS || cur.mirE ? ' · 🪞' : ''));
+    api.setInfo(`Q${n + 1}` + (cur.mirS || cur.mirE ? ' · mirror' : ''));
   }
 
   function answer(v, btn) {

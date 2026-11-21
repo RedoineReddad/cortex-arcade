@@ -1,6 +1,6 @@
 // Trail Mix: Trail-Making-Test-B. Tap 1 → A → 2 → B … as fast as you can.
 // Twist: halfway through each board, every dot you have not reached yet jumps to a new spot.
-import { clamp, randf } from '../core/util.js';
+import { clamp, randf, shuffle } from '../core/util.js';
 
 export default function start(api) {
   const { h, level } = api;
@@ -102,12 +102,15 @@ export default function start(api) {
         type: 'button', 'data-i': i,
         style: { width: D + 'px', height: D + 'px', fontSize: D * 0.42 + 'px', transition: 'none' },
         onpointerdown: (e) => { e.preventDefault(); tap(i, e); },
+        // keyboard activation (Enter/Space on a focused dot) arrives as a click with detail 0
+        onclick: (e) => { if (e.detail === 0) { const r = el.getBoundingClientRect(); tap(i, { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }); } },
       }, lab);
       const n = { el, i, x: 0, y: 0 };
       place(n, pts[i], W, H);
-      board.append(el);
       return n;
     });
+    // DOM (and Tab) order is shuffled so it doesn't give the sequence away
+    shuffle(nodes).forEach((n) => board.append(n.el));
     void board.offsetWidth;
     nodes.forEach((n) => (n.el.style.transition = ''));
     next = 0;

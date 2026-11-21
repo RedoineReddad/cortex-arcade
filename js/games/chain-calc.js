@@ -59,7 +59,7 @@ export default function start(api) {
     if (n >= TOTAL) {
       sw.stop();
       const t = sw.elapsed;
-      const speed = Math.max(0, Math.round(120 - t * 1.2) * (correct / TOTAL));
+      const speed = Math.round(Math.max(0, 120 - t * 1.2) * (correct / TOTAL)); // integer, as scores must be
       api.end({
         score: correct * 5 + speed,
         stats: { Correct: `${correct} / ${TOTAL}`, Time: t.toFixed(1) + 's', 'Per answer': (t / TOTAL).toFixed(2) + 's' },

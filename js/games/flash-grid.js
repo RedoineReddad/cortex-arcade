@@ -17,7 +17,9 @@ export default function start(api) {
       background:var(--bg2); border:2px solid var(--line); box-shadow:var(--shadow);
       transform-origin:50% 50%;
     }
-    .fg-board.spin { transition:transform .8s cubic-bezier(.55,.05,.35,1); }
+    /* shrink while turning so the corners never sweep over the caption or out of the stage */
+    .fg-board.spin { transition:rotate .8s cubic-bezier(.55,.05,.35,1); animation:fgShrink .8s ease-in-out; }
+    @keyframes fgShrink { 0%, 100% { scale:1; } 22%, 78% { scale:.7; } }
     .fg-tile {
       border-radius:12px; border:2px solid var(--line); background:var(--panel-solid);
       cursor:pointer; padding:0; transition:background .15s, border-color .15s, transform .08s;
@@ -49,6 +51,16 @@ export default function start(api) {
   api.setScore(0);
 
   let n = 3, targets = new Set(), found = new Set(), accepting = false, cells = [];
+  // keyboard: arrows move a focus cursor over the board, Enter/Space taps the focused tile
+  let cursor = 0, usingKeys = false;
+  const focusCell = () => { cursor = Math.min(cursor, cells.length - 1); cells[cursor]?.focus({ preventScroll: true }); };
+  const moveBy = (dr, dc) => () => {
+    usingKeys = true;
+    const r = Math.max(0, Math.min(n - 1, Math.floor(cursor / n) + dr)), c = Math.max(0, Math.min(n - 1, (cursor % n) + dc));
+    cursor = r * n + c;
+    focusCell();
+  };
+  api.keys({ ArrowUp: moveBy(-1, 0), ArrowDown: moveBy(1, 0), ArrowLeft: moveBy(0, -1), ArrowRight: moveBy(0, 1) });
   const sizeFor = (t) => (t <= 3 ? 3 : t <= 5 ? 4 : t <= 7 ? 5 : 6);
 
   function build(size) {
@@ -57,7 +69,13 @@ export default function start(api) {
     board.style.gridTemplateRows = `repeat(${size}, 1fr)`;
     cells = [];
     for (let i = 0; i < size * size; i++) {
-      const b = h('button.fg-tile', { type: 'button', 'aria-label': 'tile', onpointerdown: (e) => { e.preventDefault(); tap(i, e); } });
+      const b = h('button.fg-tile', {
+        type: 'button', 'aria-label': `Row ${Math.floor(i / size) + 1}, column ${(i % size) + 1}`,
+        onpointerdown: (e) => { e.preventDefault(); usingKeys = false; tap(i, e); },
+        onfocus: () => { cursor = i; },
+        // keyboard activation (Enter / Space) fires a click with detail 0; pointer taps are handled above
+        onclick: (e) => { if (e.detail === 0) { usingKeys = true; const r = b.getBoundingClientRect(); tap(i, { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }); } },
+      });
       cells.push(b);
       board.append(b);
     }
@@ -80,7 +98,7 @@ export default function start(api) {
     maxTiles = Math.max(maxTiles, tiles);
     build(n);
     board.classList.remove('spin', 'input');
-    board.style.transform = 'rotate(0deg)';
+    board.style.rotate = '0deg';
     accepting = false;
     found = new Set();
     targets = new Set(sample([...Array(n * n).keys()], tiles));
@@ -102,19 +120,20 @@ export default function start(api) {
         const deg = q * 90;
         api.after(300, () => {
           board.classList.add('spin');
-          board.style.transform = `rotate(${deg}deg)`;
+          board.style.rotate = `${deg}deg`;
           api.after(900, () => {
             // re-render un-rotated, with targets mapped to their new homes
             const quarter = ((q % 4) + 4) % 4;
             targets = new Set([...targets].map((i) => rotIdx(i, quarter)));
             board.classList.remove('spin');
-            board.style.transform = 'none';
+            board.style.rotate = '0deg';
             mark.className = 'fg-mark c' + ((corner + quarter) % 4);
             spinTxt.textContent = q === -1 ? '↺ 90°' : `↻ ${deg}°`;
             status.className = 'fg-status go';
             status.textContent = 'Tap where they are now';
             board.classList.add('input');
             accepting = true;
+            if (usingKeys) focusCell(); // the board was rebuilt, so put keyboard focus back on it
           });
         });
       });

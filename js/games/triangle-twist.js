@@ -8,7 +8,7 @@ export default function start(api) {
   let cur = null, locked = false;
 
   api.css(`
-    .tt-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; flex: 1; min-height: 0; justify-content: center; }
+    .tt-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; flex: 1; min-height: 0; justify-content: center; }
     .tt-board { display: flex; flex-direction: column; align-items: center; gap: var(--tt-g); --tt-s: clamp(56px, 19vw, 86px); --tt-g: clamp(8px, 2.4vw, 14px); }
     .tt-board.w4 { --tt-s: clamp(52px, 16vw, 80px); }
     .tt-row { display: flex; gap: var(--tt-g); position: relative; }
@@ -25,6 +25,7 @@ export default function start(api) {
     }
     .tt-row.add .tt-cell::after { content: "+"; color: #3b82f6; }
     .tt-row.sub .tt-cell::after { content: "−"; color: #ef4444; }
+    .tt-cell.long { font-size: calc(var(--tt-s) * .32); }
     .tt-cell.filled { border-style: solid; animation: pop .3s ease-out; }
     .tt-cell.final { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent); }
     .tt-cell.final.typing { color: var(--c); }
@@ -45,11 +46,12 @@ export default function start(api) {
   const kpWrap = h('div.tt-kp');
   api.stage.append(h('div.tt-wrap', board, legend), kpWrap);
 
-  api.keypad({
-    parent: kpWrap, maxLen: 4, negative: true, hideDisplay: true,
+  const kp = api.keypad({
+    parent: kpWrap, maxLen: 3, negative: true, hideDisplay: true, // answers never exceed 3 digits (max 8 × 15 = 120)
     onChange: (v) => {
       if (!cur || locked) return;
       cur.finalEl.textContent = v ? v.replace('-', '−') : '?';
+      cur.finalEl.classList.toggle('long', v.length >= 4);
       cur.finalEl.classList.toggle('typing', !!v);
     },
     onSubmit: answer,
@@ -83,6 +85,7 @@ export default function start(api) {
     finalEl.textContent = '?';
     cur = { rows, cells, finalEl, answer: rows[rows.length - 1][0] };
     locked = false;
+    kp.clear(); // drop anything typed while the last answer was being shown
     api.setInfo(`✓ ${correct}  ✗ ${wrong}`);
   }
 
@@ -97,6 +100,7 @@ export default function start(api) {
       row.forEach((val, ci) => {
         const c = cells[ri][ci];
         c.textContent = String(val).replace('-', '−');
+        c.classList.toggle('long', String(val).length >= 4);
         c.classList.add('filled');
       });
     });

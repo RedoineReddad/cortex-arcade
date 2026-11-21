@@ -9,6 +9,8 @@ export default function start(api) {
   const GAP = 8;
 
   api.css(`
+    :root { --sp-warn:#b45309; --sp-glow:#f59e0b; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --sp-warn:#fbbf24; --sp-glow:#fbbf24; } }
     .sp-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; flex:1; min-height:0; justify-content:center; }
     .sp-board { position:relative; flex:none; }
     .sp-card {
@@ -32,13 +34,13 @@ export default function start(api) {
     .sp-card:hover .sp-back { border-color:var(--c); }
     .sp-card.up .sp-back, .sp-card:not(.up) .sp-face { visibility:hidden; transition:visibility 0s .2s; }
     .sp-face { background:var(--panel-solid); transform:rotateY(180deg); font-size:var(--sp-fs, 2rem); }
-    .sp-card.moving .sp-back { border-color:#fbbf24; box-shadow:0 0 0 3px #fbbf24, 0 0 22px 4px rgba(251,191,36,.55); }
+    .sp-card.moving .sp-back { border-color:var(--sp-glow); box-shadow:0 0 0 3px var(--sp-glow), 0 0 22px 4px color-mix(in srgb,var(--sp-glow) 55%,transparent); }
     .sp-card.done .sp-face { border-color:var(--good); background:color-mix(in srgb,var(--good) 16%,var(--panel-solid)); animation:spPop .35s ease-out; }
     .sp-card.done { cursor:default; }
     .sp-card.miss .sp-face { border-color:var(--bad); background:color-mix(in srgb,var(--bad) 14%,var(--panel-solid)); }
     @keyframes spPop { 50% { transform:rotateY(180deg) scale(1.12); } }
     .sp-msg { min-height:1.4em; font-weight:700; color:var(--muted); text-align:center; }
-    .sp-msg.warn { color:#f59e0b; }
+    .sp-msg.warn { color:var(--sp-warn); }
   `);
 
   const board = h('div.sp-board');
@@ -49,7 +51,7 @@ export default function start(api) {
   const syms = sample(SYMBOLS, PAIRS);
   // slots[i] = card at slot i
   const cards = shuffle([...syms, ...syms]).map((s, i) => {
-    const el = h('button.sp-card', { type: 'button', 'aria-label': 'card' },
+    const el = h('button.sp-card', { type: 'button', 'aria-label': 'Hidden card' },
       h('div.sp-inner', h('div.sp-side.sp-back'), h('div.sp-side.sp-face', s)));
     const c = { sym: s, slot: i, el, up: false, done: false };
     el.addEventListener('click', () => flip(c));
@@ -89,6 +91,7 @@ export default function start(api) {
     if (busy || api.ended || c.up || c.done) return;
     c.up = true;
     c.el.classList.add('up');
+    c.el.setAttribute('aria-label', c.sym);
     flips++;
     api.sfx.tick();
     open.push(c);
@@ -120,6 +123,7 @@ export default function start(api) {
       api.after(1000, () => {
         a.up = b.up = false;
         a.el.classList.remove('up', 'miss'); b.el.classList.remove('up', 'miss');
+        a.el.setAttribute('aria-label', 'Hidden card'); b.el.setAttribute('aria-label', 'Hidden card');
         api.after(450, shift);
       });
     }
@@ -143,6 +147,12 @@ export default function start(api) {
       place(x); place(y);
       api.after(700, () => {
         x.el.classList.remove('moving'); y.el.classList.remove('moving');
+        // once they have landed, move just these two nodes so the Tab order follows the slots on screen
+        // (moving a node drops focus, so restore it)
+        const had = document.activeElement;
+        const order = cards.slice().sort((p, q) => p.slot - q.slot);
+        [x, y].forEach((c) => { const nxt = order[order.indexOf(c) + 1]; board.insertBefore(c.el, nxt ? nxt.el : null); });
+        if (had && had !== document.activeElement && board.contains(had)) had.focus({ preventScroll: true });
         msg.className = 'sp-msg';
         msg.textContent = '';
         busy = false;

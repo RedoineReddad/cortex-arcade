@@ -109,7 +109,7 @@ export default function start(api) {
     .sl-scales > * { flex:0 1 calc(50% - clamp(6px,1.6vw,14px)); min-width:0; }
     .sl-scales.one > * { flex-basis:min(360px,100%); }
     .sl-scales.two { width:min(720px,100%); }
-    @media (max-aspect-ratio: 3/4) { .sl-scales.two > * { flex-basis:min(330px,100%); } }
+    @media (max-aspect-ratio: 3/4) { .sl-scales.two > * { flex-basis:min(330px,100%); } .sl-scales.n3 > * { flex-basis:min(330px,100%,34vh); } }
     .sl-scale { background:var(--panel-solid); border:1px solid var(--line); border-radius:18px; padding:4px 4px 0; animation:sl-in .4s both; }
     .sl-scale svg { display:block; width:100%; height:auto; overflow:visible; }
     .sl-beam { transform-origin:100px 46px; transition:transform .7s cubic-bezier(.3,1.6,.5,1); }
@@ -169,7 +169,7 @@ export default function start(api) {
   function show() {
     locked = false;
     puzzle = makePuzzle(level);
-    scalesEl.className = 'sl-scales' + (puzzle.scales.length === 1 ? ' one' : puzzle.scales.length === 2 ? ' two' : '');
+    scalesEl.className = 'sl-scales' + (puzzle.scales.length === 1 ? ' one' : puzzle.scales.length === 2 ? ' two' : '') + ' n' + puzzle.scales.length;
     scalesEl.replaceChildren(...puzzle.scales.map((s, i) => drawScale(s, puzzle.names, i)));
     q.replaceChildren('Which is the ', h('b', puzzle.want.toUpperCase()), '?');
     btns.replaceChildren(...puzzle.names.map((nm, i) => h('button.sl-btn', { type: 'button', onclick: (e) => answer(i, e) }, h('kbd', String(i + 1)), nm)));

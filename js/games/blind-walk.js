@@ -29,7 +29,8 @@ export default function start(api) {
     .bw-grid { display:grid; width:100%; height:100%; gap:4px; }
     .bw-cell { border-radius:10px; border:1px solid var(--line); background:color-mix(in srgb,var(--bg2) 80%,transparent); padding:0; cursor:default; position:relative; }
     .bw-grid.bw-live .bw-cell { cursor:pointer; background:var(--panel-solid); }
-    .bw-grid.bw-live .bw-cell:hover, .bw-cell.bw-cur { border-color:var(--c); box-shadow:inset 0 0 0 2px var(--c); }
+    .bw-grid.bw-live .bw-cell:hover { border-color:var(--c); box-shadow:inset 0 0 0 2px var(--c); }
+    .bw-cell.bw-cur { border-color:var(--c); box-shadow:inset 0 0 0 4px var(--c); background:color-mix(in srgb,var(--c) 18%,var(--panel-solid)) !important; }
     .bw-cell.bw-right { background:color-mix(in srgb,var(--good) 35%,var(--panel-solid)) !important; border-color:var(--good); }
     .bw-cell.bw-wrong { background:color-mix(in srgb,var(--bad) 35%,var(--panel-solid)) !important; border-color:var(--bad); }
     .bw-start { position:absolute; inset:12%; border-radius:50%; background:var(--c); color:var(--c-ink); display:grid; place-items:center;
@@ -67,40 +68,44 @@ export default function start(api) {
   const inside = (r, c) => r >= 0 && c >= 0 && r < G && c < G;
 
   // Generate an instruction list of `count` steps that never leaves the grid.
+  // The walker always faces the way it last moved: compass steps (↑ → ↓ ←) turn it too,
+  // and a turn is always followed by "Forward n".
   function generate(count) {
     for (let tries = 0; tries < 500; tries++) {
       const r0 = rand(0, G - 1), c0 = rand(0, G - 1), f0 = rand(0, 3);
-      let r = r0, c = c0, f = f0, pendingTurn = false, ok = true;
+      let r = r0, c = c0, f = f0, ok = true;
       const list = [], path = [[r, c]];
       const move = (d, n) => { for (let k = 0; k < n; k++) { r += DR[d]; c += DC[d]; path.push([r, c]); } };
       const fits = (d) => [1, 2, 3].filter((n) => n <= MAXN && inside(r + DR[d] * n, c + DC[d] * n));
+      const fwd = () => { const n = pick(fits(f)); list.push({ kind: 'fwd', n, text: `Forward ${n}`, rel: true }); move(f, n); };
       for (let k = 0; k < count && ok; k++) {
         const left = count - k;
         const prevTurn = list.length && list[list.length - 1].kind === 'turn';
-        if (pendingTurn && left === 1) {
-          const ns = fits(f);
-          if (!ns.length) { ok = false; break; }
-          const n = pick(ns); list.push({ kind: 'fwd', n, text: `Forward ${n}`, rel: true }); move(f, n); pendingTurn = false;
+        if (prevTurn) {
+          if (!fits(f).length) { ok = false; break; }
+          fwd();
           continue;
         }
         if (Math.random() < REL_P) {
-          if (left > 1 && !prevTurn && Math.random() < 0.55) {
+          if (left > 1 && Math.random() < 0.55) {
             const t = pick(['L', 'L', 'R', 'R', 'A']);
-            f = (f + (t === 'L' ? 3 : t === 'R' ? 1 : 2)) % 4;
-            list.push({ kind: 'turn', text: t === 'L' ? 'Turn left ↺' : t === 'R' ? 'Turn right ↻' : 'About-face ⟲', rel: true });
-            pendingTurn = true;
-            continue;
+            const nf = (f + (t === 'L' ? 3 : t === 'R' ? 1 : 2)) % 4;
+            if (fits(nf).length) {
+              f = nf;
+              list.push({ kind: 'turn', text: t === 'L' ? 'Turn left ↺' : t === 'R' ? 'Turn right ↻' : 'About-face ⟲', rel: true });
+              continue;
+            }
           }
-          const ns = fits(f);
-          if (ns.length) { const n = pick(ns); list.push({ kind: 'fwd', n, text: `Forward ${n}`, rel: true }); move(f, n); pendingTurn = false; continue; }
+          if (fits(f).length) { fwd(); continue; }
         }
         const dirs = [0, 1, 2, 3].filter((d) => fits(d).length);
         if (!dirs.length) { ok = false; break; }
         const d = pick(dirs), n = pick(fits(d));
         list.push({ kind: 'abs', n, text: `${ARROW[d]} ${n}`, rel: false });
         move(d, n);
+        f = d;
       }
-      if (!ok || pendingTurn || list[list.length - 1].kind === 'turn') continue;
+      if (!ok || list[list.length - 1].kind === 'turn') continue;
       if (r === r0 && c === c0) continue;
       // at least one relative step from round 2 on, so the twist always matters
       if (round >= 1 && !list.some((x) => x.rel)) continue;
@@ -124,7 +129,7 @@ export default function start(api) {
     dots.replaceChildren(...cur.list.map(() => h('i')));
     ins.className = 'bw-ins';
     ins.textContent = 'Ready…';
-    hint.textContent = `Start here, facing ${['north ↑', 'east →', 'south ↓', 'west ←'][cur.f0]}`;
+    hint.textContent = `Start here, facing ${['north ↑', 'east →', 'south ↓', 'west ←'][cur.f0]}. It turns to face each way it walks.`;
     api.setInfo(`Round ${round + 1}/${ROUNDS}`);
     api.setProgress(round / ROUNDS);
     let k = 0;

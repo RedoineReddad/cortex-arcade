@@ -97,17 +97,20 @@ export default function start(api) {
   }
   renderKey();
 
-  let score = 0, correct = 0, wrong = 0, memCorrect = 0, hidden = false, cur = null, hideStart = 0;
+  let score = 0, correct = 0, wrong = 0, memCorrect = 0, hidden = false, cur = null, hideStart = 0, shownAt = 0;
   api.setScore(0);
 
   function nextGlyph() {
     cur = pick(glyphs.filter((g) => g !== cur));
     big.replaceChildren(glyphSvg(cur));
     big.classList.remove('sc-pop'); void big.offsetWidth; big.classList.add('sc-pop');
+    shownAt = performance.now();
   }
 
   function answer(d, e) {
     if (api.ended || !cur) return;
+    // a double tap would otherwise answer the next glyph too
+    if (performance.now() - shownAt < 150) return;
     const ok = digitOf.get(cur) === d;
     const btn = padBtns[d];
     btn.classList.remove('sc-ok', 'sc-no'); void btn.offsetWidth;
@@ -131,7 +134,7 @@ export default function start(api) {
     api.setScore(score);
   }
 
-  api.keys(Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => [String(d), () => answer(d)])));
+  api.keys(Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => [String(d), (e) => { if (!e.repeat) answer(d); }])));
 
   // Key flip cycle
   function hideKey() {

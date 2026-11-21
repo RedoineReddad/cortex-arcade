@@ -2,7 +2,8 @@
 import { rand, clamp } from '../core/util.js';
 
 const COLORS = ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
-const FWD = '#22c55e', REV = '#f97316';
+// mode colours: darker on paper so the FORWARD / REVERSE labels pass AA, brighter on the chalkboard
+const FWD = 'var(--es-fwd)', REV = 'var(--es-rev)';
 
 export default function start(api) {
   const { h, level } = api;
@@ -14,6 +15,8 @@ export default function start(api) {
   let seq = [], expect = [], pos = 0, accepting = false, reverse = false;
 
   api.css(`
+    :root { --es-fwd:#15803d; --es-rev:#c2410c; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --es-fwd:#4ade80; --es-rev:#fb923c; } }
     .es-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
     .es-ring {
       position:relative; width:min(380px, 88vw, 50dvh); aspect-ratio:1; border-radius:50%;
@@ -44,7 +47,8 @@ export default function start(api) {
     .es-steps { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; min-height:14px; max-width:340px; }
     .es-step { width:14px; height:14px; border-radius:50%; background:var(--line); transition:background .15s; }
     .es-step.on { background:var(--es-mode, ${FWD}); }
-    .es-lives { font-size:1.3rem; letter-spacing:4px; }
+    .es-lives { font-size:1.05rem; font-weight:700; color:var(--muted); display:flex; gap:10px; align-items:center; }
+    .es-lives b { font-size:1.3rem; letter-spacing:3px; color:var(--c); font-weight:400; }
     .banner.es-b-fwd { border-color:${FWD}; color:${FWD}; }
     .banner.es-b-rev { border-color:${REV}; color:${REV}; }
   `);
@@ -61,6 +65,7 @@ export default function start(api) {
       type: 'button', 'aria-label': 'pad ' + (i + 1),
       style: { left: 50 + 36 * Math.cos(a) + '%', top: 50 + 36 * Math.sin(a) + '%', '--pc': COLORS[i] },
       onpointerdown: (e) => { e.preventDefault(); press(i); },
+      onclick: (e) => { if (e.detail === 0) press(i); }, // Enter / Space on a focused pad
     }, String(i + 1));
     p.style.setProperty('--pc', COLORS[i]);
     pads.push(p);
@@ -69,14 +74,20 @@ export default function start(api) {
   ring.append(center);
   const steps = h('div.es-steps');
   const sub = h('div.g-sub', 'Keys 1–' + PADS + ' work too');
-  const wrap = h('div.es-wrap', ring, steps, sub);
+  // lives are also in the HUD, but the HUD info pill is hidden on phones, so show them on the stage too
+  const livesEl = h('div.es-lives', { 'aria-live': 'polite' });
+  const wrap = h('div.es-wrap', ring, steps, livesEl, sub);
   api.stage.append(wrap);
   const km = {};
   for (let i = 0; i < PADS; i++) km[String(i + 1)] = () => press(i);
   api.keys(km);
   api.setScore(0);
 
-  const showLives = () => api.setInfo(`${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)} · Round ${Math.min(round, MAX_ROUNDS)}/${MAX_ROUNDS}`);
+  const showLives = () => {
+    const hearts = `${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}`, rd = `Round ${Math.min(round, MAX_ROUNDS)}/${MAX_ROUNDS}`;
+    api.setInfo(`${hearts} · ${rd}`);
+    livesEl.replaceChildren(h('b', { 'aria-label': `${lives} of 3 lives left` }, hearts), h('span', rd));
+  };
 
   function flash(i, ms) {
     pads[i].classList.add('lit');

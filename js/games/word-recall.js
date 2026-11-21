@@ -31,7 +31,7 @@ export default function start(api) {
     }
     .wr-study .wr-word { border-color:color-mix(in srgb,var(--c) 45%,var(--line)); animation:wrIn .35s ease-out backwards; }
     @keyframes wrIn { from { opacity:0; transform:translateY(8px) scale(.96); } }
-    .wr-pick { cursor:pointer; font-size:1rem; padding:10px 4px; color:var(--text); transition:background .12s, border-color .12s, transform .08s; }
+    .wr-pick { cursor:pointer; font-size:1rem; padding:10px 4px; min-height:44px; color:var(--text); transition:background .12s, border-color .12s, transform .08s; }
     .wr-pick:hover { border-color:var(--c); }
     .wr-pick:active { transform:scale(.96); }
     .wr-pick.on { background:color-mix(in srgb,var(--c) 28%,var(--panel-solid)); border-color:var(--c); }
@@ -58,8 +58,16 @@ export default function start(api) {
   const wrap = h('div.wr-wrap');
   api.stage.append(wrap);
   api.setScore(0);
-  let onEnter = null;
-  api.keys({ Enter: () => onEnter && onEnter() });
+  let onEnter = null, enterOkAt = 0;
+  // Enter = Ready / Done, unless a button has keyboard focus: then Enter presses that button (toggles a word).
+  // A short guard stops a double or held Enter from skipping straight through the recall board.
+  api.on(window, 'keydown', (e) => {
+    if (e.key !== 'Enter' || api.ended || api.paused) return;
+    if (document.activeElement && document.activeElement.closest && document.activeElement.closest('.wr-wrap button')) return;
+    e.preventDefault();
+    if (e.repeat || performance.now() < enterOkAt) return;
+    onEnter && onEnter();
+  });
 
   function study() {
     if (api.ended) return;
@@ -93,6 +101,7 @@ export default function start(api) {
   }
 
   function recall(items) {
+    enterOkAt = performance.now() + 700;
     api.setInfo(`Round ${round}/${ROUNDS} · recall`);
     const studied = new Set(items.map((i) => i.word));
     const words = shuffle(items.flatMap((i) => [i.word, i.cousin]));
