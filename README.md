@@ -8,7 +8,8 @@ cognitive-training idea (Stroop, n-back, Trail Making, multiple-object tracking,
 digit-symbol coding and so on) and adds **an original twist**.
 
 * **No build step, no framework, no network calls.** Vanilla ES modules, and each game is lazy-loaded on demand.
-* **three.js** (r170, vendored and lazy-loaded) runs the ambient home-screen background and the 3D spatial games.
+* **Drill-book design:** graph paper by day and a classroom chalkboard in dark mode. The teacher's red pen marks your scores. Type is Atkinson Hyperlegible, with Kalam for the pen; both are self-hosted.
+* **three.js** (r170, bundled with the app and loaded only when needed) runs the two 3D spatial games.
 * **Daily Brain Check:** three games picked for the day give an estimated *brain age* (20–80, lower is better).
 * **Adaptive difficulty:** each game has 5 levels, adjusted from your recent ratings.
 * **Progress:** a skill-profile radar across 6 areas, a brain-age trend, personal bests and a day streak, all stored locally.
@@ -89,13 +90,13 @@ folder to GitHub Pages, Netlify, Cloudflare Pages or any static host.
 index.html              entry point + import map for three.js
 css/style.css           design system (light/dark) and shared game classes
 js/app.js               router, library, intro/results, daily check, stats
-js/bg.js                three.js ambient background
 js/core/api.js          game runtime: timers, HUD, keypad, feedback, auto-cleanup
 js/core/storage.js      plays, bests, adaptive levels, streak (localStorage)
 js/core/audio.js        tiny WebAudio synth (no sound files)
 js/games/catalog.js     metadata for every game
 js/games/<id>.js        one module per game
 vendor/                 three.js r170 (MIT)
+fonts/                  Atkinson Hyperlegible + Kalam (OFL)
 sw.js                   offline cache
 tests/smoke.mjs         Playwright smoke test (random input on every game)
 docs/GAME_API.md        how to write a new game

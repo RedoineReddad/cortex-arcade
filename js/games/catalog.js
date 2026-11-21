@@ -4,12 +4,12 @@
 // par: the score a solid adult player reaches; rating = 100 * score / par (capped at 120).
 
 export const CATEGORIES = {
-  math: { name: 'Calculation', color: '#f59e0b', icon: '➗' },
-  memory: { name: 'Memory', color: '#a855f7', icon: '🧠' },
-  attention: { name: 'Attention', color: '#06b6d4', icon: '🎯' },
-  speed: { name: 'Speed', color: '#ef4444', icon: '⚡' },
-  spatial: { name: 'Spatial', color: '#10b981', icon: '🧊' },
-  logic: { name: 'Logic & Language', color: '#3b82f6', icon: '🧩' },
+  math: { name: 'Calculation', color: '#2f6db5', icon: '➗' },
+  memory: { name: 'Memory', color: '#7b52b9', icon: '🧠' },
+  attention: { name: 'Attention', color: '#11867c', icon: '🎯' },
+  speed: { name: 'Speed', color: '#cf731c', icon: '⚡' },
+  spatial: { name: 'Spatial', color: '#4b8b2c', icon: '🧊' },
+  logic: { name: 'Logic & Language', color: '#a5457a', icon: '🧩' },
 };
 
 export const GAMES = [

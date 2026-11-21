@@ -25,7 +25,7 @@ for (const id of ids) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   try {
     await page.goto(base + '#/play/' + id);
-    await page.click('.intro .btn.primary');
+    await page.click('.sheet .btn.primary');
     await page.waitForFunction(() => window.__cortex && !document.querySelector('.countdown'), null, { timeout: 8000 });
     await page.waitForTimeout(1200);
     if (process.env.SHOTS) await page.screenshot({ path: `tests/shots/${id}-a.png` });

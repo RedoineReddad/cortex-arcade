@@ -1,4 +1,4 @@
-// Cortex Arcade: app shell (router, library, game runner, daily check, stats).
+// Cortex Arcade: app shell (router, contents page, worksheets, game runner, daily drill, progress).
 import { h, todayKey, seeded, clamp } from './core/util.js';
 import { createApi } from './core/api.js';
 import { sfx, isMuted, setMuted } from './core/audio.js';
@@ -7,36 +7,64 @@ import { GAMES, CATEGORIES, byId } from './games/catalog.js';
 
 const app = document.getElementById('app');
 let current = null; // running game api
-let filter = 'all';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 const ratingOf = (g, score) => clamp(Math.round((100 * score) / g.par), 0, 120);
 const brainAge = (avg) => clamp(Math.round(80 - avg * 0.6), 20, 80);
 const catColor = (c) => CATEGORIES[c].color;
+const subj = (g) => ({ '--c': catColor(g.cat) });
 
-function stars(r) {
-  const n = r >= 100 ? 3 : r >= 65 ? 2 : r >= 30 ? 1 : 0;
-  return h('div.stars', [0, 1, 2].map((i) => h('span' + (i < n ? '.on' : ''), '★')));
+function verdict(r) {
+  if (r >= 100) return 'Excellent!';
+  if (r >= 75) return 'Very good';
+  if (r >= 50) return 'Good work';
+  if (r >= 25) return 'Keep practising';
+  return 'Try again tomorrow';
+}
+
+const svgIcon = (d, label) => h('svg', { viewBox: '0 0 24 24', 'aria-hidden': 'true', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
+  d.map((p) => h('path', { d: p })));
+const ICON = {
+  back: ['M15 18l-6-6 6-6'],
+  soundOn: ['M4 9v6h4l5 4V5L8 9H4z', 'M16.5 8.5a5 5 0 010 7', 'M19 6a8.5 8.5 0 010 12'],
+  soundOff: ['M4 9v6h4l5 4V5L8 9H4z', 'M17 9l5 6', 'M22 9l-5 6'],
+};
+
+/** A score marked by the teacher: red pen numerals with a hand-drawn loop around them. */
+function graded(text, { animate = true, size } = {}) {
+  return h('span.graded' + (animate ? '.animate' : ''), size ? { style: { fontSize: size } } : null,
+    h('span.mark', String(text)),
+    h('svg', { viewBox: '0 0 200 100', preserveAspectRatio: 'none', 'aria-hidden': 'true' },
+      h('path', { pathLength: '1', d: 'M112 9C48 3 6 26 9 55c3 30 62 41 114 37 52-4 75-28 68-55C184 11 134 2 78 12' })));
 }
 
 function abortCurrent() {
   if (current) { current._abort(); current = null; }
 }
 
-function topbar(title, back = '#/') {
-  return h('header.topbar',
-    h('a.back', { href: back, 'aria-label': 'Back' }, '‹'),
-    h('h1.tb-title', title),
-    muteBtn());
+function backLink(href = '#/', label = 'Contents') {
+  return h('a.back', { href }, svgIcon(ICON.back), label);
+}
+
+function topbar(title, back = '#/', backLabel) {
+  return h('header.topbar', backLink(back, backLabel), h('p.tb-title', title || ''), muteBtn());
 }
 
 function muteBtn() {
-  const b = h('button.icon-btn', { type: 'button', title: 'Sound', 'aria-label': 'Toggle sound' }, isMuted() ? '🔇' : '🔊');
-  b.onclick = () => { setMuted(!isMuted()); b.textContent = isMuted() ? '🔇' : '🔊'; if (!isMuted()) sfx.good(); };
+  const b = h('button.icon-btn', { type: 'button' });
+  const paint = () => {
+    b.replaceChildren(svgIcon(isMuted() ? ICON.soundOff : ICON.soundOn));
+    b.setAttribute('aria-label', isMuted() ? 'Turn sound on' : 'Turn sound off');
+    b.title = b.getAttribute('aria-label');
+  };
+  b.onclick = () => { setMuted(!isMuted()); paint(); if (!isMuted()) sfx.good(); };
+  paint();
   return b;
 }
 
-// ─── Daily check ───────────────────────────────────────────────────────────
+const longDate = (d = new Date()) => d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+// ─── Daily drill ───────────────────────────────────────────────────────────
 function dailyGames(day = todayKey()) {
   const rnd = seeded(day.split('-').join('') * 7);
   const pickFrom = (cats) => {
@@ -51,90 +79,89 @@ function viewHome() {
   const daily = store.getDaily();
   const ids = dailyGames();
   const st = store.streak();
-  const plays = store.allPlays().length;
 
-  const dailyCard = h('section.daily-card',
-    h('div.daily-left',
-      h('div.eyebrow', 'Daily Brain Check · ' + new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })),
-      daily
-        ? h('div', h('div.daily-age', h('span', daily.age), h('small', 'brain age')), h('p.muted', 'Done for today. Come back tomorrow to see your trend.'))
-        : h('div', h('h2', 'Three games, about five minutes.'), h('p.muted', 'Your results give an estimated "brain age". Lower is better.')),
-      h('div.daily-games', ids.map((id) => h('span.chip', { style: { '--c': catColor(byId[id].cat) } }, byId[id].icon + ' ' + byId[id].title))),
-      h('a.btn.primary', { href: '#/daily' }, daily ? 'Retake' : 'Start daily check')),
-    h('div.daily-right',
-      h('div.stat', h('b', st), h('span', 'day streak')),
-      h('div.stat', h('b', plays), h('span', 'games played')),
-      h('a.btn.ghost', { href: '#/stats' }, 'Your stats →')));
+  const masthead = h('header.masthead',
+    h('div',
+      h('h1.title', h('span', 'Cortex'), h('span', 'Arcade')),
+      h('p.tagline', 'A daily drill book for your brain. 25 exercises, a few minutes a day.')),
+    h('div.mast-side',
+      st > 0 ? h('div.streak', st === 1 ? 'Day 1 of your streak' : `${st}-day streak`) : null,
+      h('div.mast-links', h('a.text-btn', { href: '#/stats' }, 'Progress'), muteBtn())));
 
-  const chips = h('nav.filters',
-    [['all', { name: 'All 25', color: '#94a3b8', icon: '✨' }], ...Object.entries(CATEGORIES)].map(([k, c]) =>
-      h('button.chip' + (filter === k ? '.active' : ''), {
-        type: 'button', style: { '--c': c.color },
-        onclick: () => { filter = k; render(); },
-      }, c.icon + ' ' + c.name)));
+  const drill = h('section.drill', { 'aria-labelledby': 'drill-h' },
+    h('div.drill-head', h('h2#drill-h', "Today's drill"), h('span.drill-date', longDate())),
+    daily
+      ? h('div.drill-done',
+          h('div', graded(daily.age, { animate: false, size: '3.4rem' }), h('div.graded-cap', 'brain age')),
+          h('p', 'Done for today. Come back tomorrow and see whether your number drops.'))
+      : h('p.drill-intro', 'Three short exercises, about five minutes in all. Your results give a brain age: lower is better.'),
+    h('ol.drill-list', ids.map((id) => {
+      const g = byId[id];
+      return h('li', { style: subj(g) }, h('span', h('b', g.title), h('span.subj', CATEGORIES[g.cat].name)));
+    })),
+    h('div.drill-actions',
+      h('a.btn.primary', { href: '#/daily' }, daily ? 'Take it again' : "Start today's drill")));
 
-  const grid = h('section.grid',
-    GAMES.filter((g) => filter === 'all' || g.cat === filter).map((g) => {
-      const b = store.best(g.id);
-      const r = store.lastRating(g.id);
-      return h('a.card', { href: '#/play/' + g.id, style: { '--c': catColor(g.cat) } },
-        h('div.card-icon', g.icon),
-        h('div.card-body',
-          h('div.card-cat', CATEGORIES[g.cat].name + (g.three ? ' · 3D' : '')),
-          h('h3', g.title),
-          h('p', g.blurb)),
-        h('div.card-foot', b != null ? h('span', 'Best ' + b) : h('span.new', 'New'), r != null ? stars(r) : null));
-    }));
+  const subjects = h('div.subjects', Object.entries(CATEGORIES).map(([k, c]) => {
+    const games = GAMES.filter((g) => g.cat === k);
+    return h('section.subject', { style: { '--c': c.color } },
+      h('h3', c.name, h('small', `${games.length} exercises`)),
+      h('ul.toc', games.map((g) => {
+        const b = store.best(g.id);
+        return h('li', h('a', { href: '#/play/' + g.id, style: subj(g) },
+          h('span.toc-title', g.title, g.three ? h('span.tag3d', '3D') : null, h('span.lead-dots')),
+          b != null ? h('span.toc-best', { title: 'Your best' }, b) : h('span.toc-best.none', 'Not tried'),
+          h('span.toc-blurb', g.blurb)));
+      })));
+  }));
 
   app.replaceChildren(
-    h('header.hero',
-      h('div.logo', h('span.logo-mark', '🧠'), h('span', 'Cortex', h('em', 'Arcade'))),
-      h('div.hero-actions', h('a.icon-btn', { href: '#/stats', title: 'Stats' }, '📊'), muteBtn())),
-    dailyCard, chips, grid,
-    h('footer.foot', 'Inspired by classic daily brain-training games. Results are for fun, not a medical assessment.'));
+    masthead,
+    drill,
+    h('div.contents-head', h('h2', 'Contents')),
+    subjects,
+    h('footer.foot', 'Inspired by daily brain-training drills. Your scores stay on this device. Brain age is a game score, not a medical assessment.'));
 }
 
 function viewIntro(g, { onStart, back = '#/', step } = {}) {
   const b = store.best(g.id);
   const lvl = store.levelFor(g.id);
   app.replaceChildren(
-    topbar(step || CATEGORIES[g.cat].name, back),
-    h('section.intro', { style: { '--c': catColor(g.cat) } },
-      h('div.intro-icon', g.icon),
+    topbar(step || '', back),
+    h('article.sheet', { style: subj(g) },
+      h('p.sheet-subject', CATEGORIES[g.cat].name + (g.three ? ', in 3D' : '')),
       h('h2', g.title),
       h('p.lead', g.blurb),
-      h('div.twist', h('b', '🌀 Twist'), h('span', g.twist)),
       h('ol.howto', g.howto.map((x) => h('li', x))),
-      h('div.intro-meta',
-        h('span', 'Level ' + lvl + '/5'),
-        h('span', b != null ? 'Best ' + b : 'First play'),
-        g.three ? h('span', '3D') : null),
-      h('button.btn.primary.big', { type: 'button', onclick: onStart, autofocus: true }, 'Start')));
+      h('p.margin-note', h('b', 'The twist:'), ' ', g.twist),
+      h('div.meta',
+        h('span', 'Level ', h('b', lvl), ' of 5'),
+        h('span', b != null ? ['Your best ', h('b', b)] : 'First attempt')),
+      h('button.btn.primary.big', { type: 'button', onclick: onStart }, 'Start')));
   app.querySelector('.btn.big').focus();
 }
 
 async function runGame(g, { back = '#/', step, onDone } = {}) {
   abortCurrent();
   const hud = {
-    timeWrap: h('div.hud-time', { hidden: true }),
+    timeWrap: h('div.hud-time', { hidden: true, 'aria-label': 'Time' }),
     time: h('span'),
-    scoreWrap: h('div.hud-score', { hidden: true }),
+    scoreWrap: h('div.hud-score', { hidden: true, 'aria-label': 'Score' }),
     score: h('span', '0'),
     info: h('div.hud-info', { hidden: true }),
     progress: h('div.hud-progress-bar'),
   };
-  hud.timeWrap.append('⏱ ', hud.time);
-  hud.scoreWrap.append('★ ', hud.score);
-  const stage = h('main.stage', { style: { '--c': catColor(g.cat) } });
-  const quit = h('a.back', { href: back, 'aria-label': 'Quit' }, '✕');
+  hud.timeWrap.append(hud.time);
+  hud.scoreWrap.append(hud.score);
+  const stage = h('main.stage', { style: subj(g) });
   app.replaceChildren(
-    h('header.hud', quit, h('div.hud-title', g.icon + ' ' + g.title), hud.info, hud.timeWrap, hud.scoreWrap),
-    h('div.hud-progress', hud.progress),
+    h('header.hud', { style: subj(g) }, backLink(back, 'Quit'), h('div.hud-title', g.title, h('small', CATEGORIES[g.cat].name)), hud.info, hud.timeWrap, hud.scoreWrap),
+    h('div.hud-progress', { style: subj(g) }, hud.progress),
     stage);
 
   // Load code while the countdown runs.
   const modP = import(`./games/${g.id}.js`);
-  const cd = h('div.countdown');
+  const cd = h('div.countdown', { 'aria-live': 'polite' });
   stage.append(cd);
   for (const n of ['3', '2', '1']) {
     cd.textContent = n; sfx.tick();
@@ -146,7 +173,7 @@ async function runGame(g, { back = '#/', step, onDone } = {}) {
   let mod;
   try { mod = await modP; } catch (e) {
     console.error(e);
-    stage.append(h('div.error', 'Could not load this game. ', h('a', { href: back }, 'Back')));
+    stage.append(h('div.error', "This exercise didn't load. Check your connection and go back to try again. ", h('a', { href: back }, 'Back to contents')));
     return;
   }
   if (!stage.isConnected) return;
@@ -171,71 +198,82 @@ async function runGame(g, { back = '#/', step, onDone } = {}) {
     if (typeof cleanup === 'function') api.onCleanup(cleanup);
   } catch (e) {
     console.error(e);
-    stage.append(h('div.error', 'This game crashed: ' + e.message));
+    stage.append(h('div.error', 'This exercise stopped with an error: ' + e.message));
   }
+}
+
+function scoreBlock(res) {
+  return h('div',
+    h('div.result-score', graded(res.score), h('p.verdict', verdict(res.rating))),
+    h('div.rating-line', h('span', 'Rating ' + res.rating), h('div.rating-bar', h('div', { style: { width: Math.min(100, res.rating) + '%' } }))));
 }
 
 function viewResult(g, res, back = '#/') {
   const idx = GAMES.indexOf(g);
   const next = GAMES[(idx + 1) % GAMES.length];
+  const bestLine = res.record
+    ? (res.prevBest == null ? 'First score recorded.' : `New personal best. Previous best was ${res.prevBest}.`)
+    : `Your best is ${Math.max(res.prevBest, res.score)}.`;
   app.replaceChildren(
-    topbar('Results', back),
-    h('section.result', { style: { '--c': catColor(g.cat) } },
-      h('div.intro-icon', g.icon),
+    topbar('', back),
+    h('article.sheet', { style: subj(g) },
+      h('p.sheet-subject', CATEGORIES[g.cat].name),
       h('h2', g.title),
-      h('div.big-score', res.score),
-      stars(res.rating),
-      res.record ? h('div.record', res.prevBest == null ? '🎉 First score logged!' : '🏆 New personal best!') : h('div.muted', 'Best: ' + Math.max(res.prevBest, res.score)),
-      h('div.rating-bar', h('div', { style: { width: Math.min(100, res.rating) + '%' } })),
-      h('div.muted.small', 'Rating ' + res.rating + ' / 100'),
+      scoreBlock(res),
+      h('p' + (res.record ? '.record' : '.muted'), bestLine),
       Object.keys(res.stats).length ? h('dl.stats', Object.entries(res.stats).flatMap(([k, v]) => [h('dt', k), h('dd', v)])) : null,
-      h('div.row',
+      h('div.actions',
         h('button.btn.primary', { type: 'button', onclick: () => runGame(g, { back }) }, 'Play again'),
-        h('a.btn.ghost', { href: '#/play/' + next.id }, 'Next: ' + next.icon + ' ' + next.title),
-        h('a.btn.ghost', { href: '#/' }, 'Library'))));
+        h('a.btn.ghost', { href: '#/play/' + next.id }, 'Next: ' + next.title))));
+  app.querySelector('.btn.primary').focus();
 }
 
 function viewDaily() {
   const ids = dailyGames();
   const results = [];
+  const label = (i) => `Today's drill, exercise ${i + 1} of ${ids.length}`;
   const step = (i) => {
     if (i >= ids.length) return finish();
     const g = byId[ids[i]];
     viewIntro(g, {
-      step: `Daily check · ${i + 1} of ${ids.length}`,
-      onStart: () => runGame(g, { step, onDone: (r) => { results.push({ g, ...r }); between(i); } }),
+      step: label(i),
+      onStart: () => runGame(g, { onDone: (r) => { results.push({ g, ...r }); between(i); } }),
     });
   };
   const between = (i) => {
     const r = results[i];
+    const last = i + 1 >= ids.length;
     app.replaceChildren(
-      topbar(`Daily check · ${i + 1} of ${ids.length}`),
-      h('section.result', { style: { '--c': catColor(r.g.cat) } },
-        h('div.intro-icon', r.g.icon), h('h2', r.g.title), h('div.big-score', r.score), stars(r.rating),
-        h('button.btn.primary.big', { type: 'button', onclick: () => step(i + 1) }, i + 1 < ids.length ? 'Next game →' : 'See my brain age')));
+      topbar(label(i)),
+      h('article.sheet', { style: subj(r.g) },
+        h('p.sheet-subject', CATEGORIES[r.g.cat].name),
+        h('h2', r.g.title),
+        scoreBlock(r),
+        h('div.actions', h('button.btn.primary.big', { type: 'button', onclick: () => step(i + 1) }, last ? 'See my brain age' : 'Next exercise'))));
+    app.querySelector('.btn.primary').focus();
   };
   const finish = () => {
     const avg = results.reduce((a, r) => a + r.rating, 0) / results.length;
     const age = brainAge(avg);
     store.setDaily(todayKey(), { age, games: results.map((r) => ({ g: r.g.id, s: r.score, r: r.rating })) });
     sfx.end();
-    const verdict = age <= 25 ? 'Razor sharp. Outstanding!' : age <= 35 ? 'Excellent. Your brain is in great shape.' : age <= 50 ? 'Solid work. Keep training daily.' : 'A gentle start. Daily practice brings this down fast.';
+    const note = age <= 25 ? 'Outstanding. Hard to beat.' : age <= 35 ? 'Excellent. Your brain is in great shape.' : age <= 50 ? 'Solid. Keep the daily habit.' : 'A gentle start. Daily practice brings this down fast.';
     app.replaceChildren(
-      topbar('Daily check complete'),
-      h('section.result.brain',
-        h('div.eyebrow', 'Your brain age today'),
-        h('div.age-ring', h('span', age)),
-        h('p.lead', verdict),
-        h('div.daily-breakdown', results.map((r) => h('div.bd', { style: { '--c': catColor(r.g.cat) } },
-          h('span', r.g.icon), h('b', r.g.title), h('span', r.score + ' pts'), stars(r.rating)))),
-        h('div.row', h('a.btn.primary', { href: '#/stats' }, 'View progress'), h('a.btn.ghost', { href: '#/' }, 'Free play'))));
+      topbar("Today's drill"),
+      h('article.sheet',
+        h('h2', 'Your brain age today'),
+        h('div.brain-age', graded(age), h('p.verdict', note)),
+        h('ol.breakdown', results.map((r) => h('li', { style: subj(r.g) },
+          h('span', h('b', r.g.title), ' ', h('span.muted.small', CATEGORIES[r.g.cat].name)),
+          h('span.pen', r.score)))),
+        h('div.actions', h('a.btn.primary', { href: '#/stats' }, 'See my progress'), h('a.btn.ghost', { href: '#/' }, 'Back to contents'))));
   };
   step(0);
 }
 
 function radar(values) {
   // values: [{label, color, v(0-100)}]
-  const n = values.length, R = 110, cx = 150, cy = 140;
+  const n = values.length, R = 105, cx = 160, cy = 140;
   const pt = (i, r) => {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
     return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
@@ -245,11 +283,10 @@ function radar(values) {
   const axes = values.map((_, i) => { const [x, y] = pt(i, R); return h('line.axis', { x1: cx, y1: cy, x2: x, y2: y }); });
   const shape = h('polygon.shape', { points: values.map((d, i) => pt(i, (R * Math.max(4, d.v)) / 100).join(',')).join(' ') });
   const labels = values.map((d, i) => {
-    const [x, y] = pt(i, R + 22);
-    return h('text.lbl', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: d.color }, d.label);
+    const [x, y] = pt(i, R + 24);
+    return h('text.lbl', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', style: { '--c': d.color } }, `${d.label} ${d.n ? d.v : '–'}`);
   });
-  const dots = values.map((d, i) => { const [x, y] = pt(i, (R * Math.max(4, d.v)) / 100); return h('circle', { cx: x, cy: y, r: 4, fill: d.color }); });
-  return h('svg.radar', { viewBox: '0 0 300 285', role: 'img', 'aria-label': 'Skill profile' }, rings, axes, shape, dots, labels);
+  return h('svg.radar', { viewBox: '0 0 320 285', role: 'img', 'aria-label': 'Skill profile: ' + values.map((d) => `${d.label} ${d.v}`).join(', ') }, rings, axes, shape, labels);
 }
 
 function viewStats() {
@@ -262,32 +299,38 @@ function viewStats() {
   const daily = Object.entries(store.allDaily()).sort(([a], [b]) => a.localeCompare(b)).slice(-14);
   let spark = null;
   if (daily.length) {
-    const W = 300, H = 90, P = 12;
+    const W = 320, H = 110, P = 16;
     const xs = (i) => P + (daily.length === 1 ? (W - 2 * P) / 2 : (i * (W - 2 * P)) / (daily.length - 1));
     const ys = (a) => P + ((a - 20) / 60) * (H - 2 * P);
-    spark = h('svg.spark', { viewBox: `0 0 ${W} ${H}` },
+    spark = h('svg.spark', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Brain age by day: ' + daily.map(([d, x]) => `${d} ${x.age}`).join(', ') },
+      h('line.axis', { x1: P, x2: W - P, y1: H - 2, y2: H - 2 }),
       h('polyline', { points: daily.map(([, d], i) => xs(i) + ',' + ys(d.age)).join(' ') }),
-      daily.map(([day, d], i) => h('g', h('circle', { cx: xs(i), cy: ys(d.age), r: 4 }),
-        h('text', { x: xs(i), y: ys(d.age) - 8, 'text-anchor': 'middle' }, d.age))));
+      daily.map(([, d], i) => h('g', h('circle', { cx: xs(i), cy: ys(d.age), r: 4 }),
+        h('text', { x: xs(i), y: ys(d.age) - 10, 'text-anchor': 'middle' }, d.age))));
   }
+  const st = store.streak();
   app.replaceChildren(
-    topbar('Your progress'),
+    topbar('Progress'),
     h('section.stats-page',
-      h('div.panel', h('h3', 'Skill profile'), h('p.muted.small', 'Average rating over your last 10 games in each area.'), radar(catVals),
-        h('div.cat-legend', catVals.map((c) => h('span', { style: { '--c': c.color } }, `${c.label} ${c.v}`)))),
-      h('div.panel', h('h3', 'Brain age trend'), spark || h('p.muted', 'Complete a daily check to start your trend.'),
-        h('div.row.small', h('span', '🔥 ' + store.streak() + '-day streak'), h('span', '🎮 ' + plays.length + ' plays'))),
-      h('div.panel.wide', h('h3', 'Personal bests'),
-        h('table.best-table', h('tbody', GAMES.map((g) => {
-          const ps = store.playsOf(g.id);
-          return h('tr', { style: { '--c': catColor(g.cat) } },
-            h('td', g.icon), h('td', h('a', { href: '#/play/' + g.id }, g.title)),
-            h('td.num', ps.length ? Math.max(...ps.map((p) => p.s)) : '—'),
-            h('td.num.muted', ps.length + '×'),
-            h('td', ps.length ? stars(Math.max(...ps.map((p) => p.r))) : ''));
-        })))),
-      h('div.panel.wide.danger',
-        h('button.btn.ghost', { type: 'button', onclick: () => { if (confirm('Erase all scores and history?')) { store.resetAll(); render(); } } }, 'Reset all data'))));
+      h('div.sheet', h('h3', 'Skill profile'), h('p.muted.small', 'Average rating over your last 10 games in each subject.'), radar(catVals)),
+      h('div.sheet',
+        h('h3', 'Brain age'),
+        h('p.muted.small', 'From your daily drills. Lower sits higher on the chart.'),
+        spark || h('p', "No drills yet. Take today's drill to start your chart.", h('br'), h('a.text-btn', { href: '#/daily' }, "Start today's drill")),
+        h('p.small', `${st}-day streak, ${plays.length} exercises played`)),
+      h('div.sheet.wide', h('h3', 'Personal bests'),
+        h('table.best-table',
+          h('thead', h('tr', h('th', { 'aria-hidden': 'true' }), h('th', 'Exercise'), h('th.num', 'Best'), h('th.num', 'Played'))),
+          h('tbody', GAMES.map((g) => {
+            const ps = store.playsOf(g.id);
+            return h('tr', { style: subj(g) },
+              h('td.subjcell', { title: CATEGORIES[g.cat].name }),
+              h('td', h('a', { href: '#/play/' + g.id }, g.title)),
+              h('td.num', ps.length ? h('span.pen', Math.max(...ps.map((p) => p.s))) : h('span.muted', '–')),
+              h('td.num.muted', ps.length ? ps.length + '×' : '–'));
+          })))),
+      h('div.danger-zone',
+        h('button.text-btn', { type: 'button', onclick: () => { if (confirm('Erase all scores and history? This cannot be undone.')) { store.resetAll(); render(); } } }, 'Erase all scores'))));
 }
 
 // ─── Router ────────────────────────────────────────────────────────────────
@@ -310,10 +353,4 @@ render();
 // Offline support (skipped on localhost so development always sees fresh files).
 if ('serviceWorker' in navigator && !/^(localhost|127\.)/.test(location.hostname)) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
-
-// Decorative three.js background, loaded after first paint and only on capable devices.
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const start = () => import('./bg.js').then((m) => m.startBackground(document.getElementById('bg'))).catch(() => {});
-  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 }); else setTimeout(start, 800);
 }

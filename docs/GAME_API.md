@@ -30,7 +30,7 @@ export default function start(api) {
   short status like "Round 3/10".
 * Support mouse, touch (pointer events) and, where sensible, keyboard. The stage has a 420×~780 phone
   layout at minimum; use `min()`/`clamp()`/percentages so it also looks good on a 1100px desktop stage.
-* Use the CSS variable `--c` (category colour), `--good`, `--bad`, `--panel-solid`, `--line`, `--text`, `--muted`, `--bg2`.
+* The app is styled as a drill book: graph paper in light mode, a chalkboard in dark mode, with the red pen (`--pen`, font `var(--hand)`) reserved for marking scores. Use the CSS variable `--c` (category colour), `--good`, `--bad`, `--panel-solid`, `--line`, `--text`, `--muted`, `--bg2`.
   The app supports light and dark mode, so don't hard-code white/black text on backgrounds.
 * Interactive elements should be `<button>`s, or carry `data-hit` / class `tap`, so the smoke test can click them.
 
