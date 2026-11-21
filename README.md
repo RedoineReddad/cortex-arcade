@@ -8,7 +8,7 @@ cognitive-training idea (Stroop, n-back, Trail Making, multiple-object tracking,
 digit-symbol coding and so on) and adds **an original twist**.
 
 * **No build step, no framework, no network calls.** Vanilla ES modules, and each game is lazy-loaded on demand.
-* **Drill-book design:** graph paper by day and a classroom chalkboard in dark mode. The teacher's red pen marks your scores. Type is Atkinson Hyperlegible, with Kalam for the pen; both are self-hosted.
+* **Drill-book design:** white graph-paper sheets on a grey desk by day, a chalkboard at night. The teacher's red pen marks your scores. Colours are documented and contrast-checked in [docs/DESIGN.md](docs/DESIGN.md). Type is Atkinson Hyperlegible, with Kalam for the pen; both are self-hosted.
 * **three.js** (r170, bundled with the app and loaded only when needed) runs the two 3D spatial games.
 * **Daily Brain Check:** three games picked for the day give an estimated *brain age* (20–80, lower is better).
 * **Adaptive difficulty:** each game has 5 levels, adjusted from your recent ratings.
@@ -110,7 +110,11 @@ node tests/smoke.mjs
 
 That runs every game with random input and fails on console errors. Other forms:
 `node tests/smoke.mjs trail-mix 20` runs one game for 20 s, and `SHOTS=1 node tests/smoke.mjs` also saves
-screenshots to `tests/shots/`. You need Playwright with Chromium installed.
+screenshots to `tests/shots/`, and `SCHEME=dark` runs the dark theme. You need Playwright with Chromium installed.
+
+For hands-on checks (keyboard focus, the skip link, tap sizes, playing a game through the real UI), drive the running app with
+[Playwright CLI](https://www.npmjs.com/package/@playwright/cli): `npx playwright-cli open http://localhost:8080/`, then `snapshot`,
+`click`, `press` and `eval`.
 
 ## Disclaimer
 

@@ -48,7 +48,7 @@ export default function start(api) {
       font-weight:900; font-size:clamp(.9rem,3.6vw,1.3rem); color:var(--c); transition:transform .1s, background .15s, border-color .15s; }
     .mb-board.mb-live .mb-port:not(.mb-emit) { cursor:pointer; border-style:solid; border-color:color-mix(in srgb,var(--c) 55%,var(--line)); background:var(--panel-solid); }
     .mb-board.mb-live .mb-port:not(.mb-emit):hover { background:color-mix(in srgb,var(--c) 25%,var(--panel-solid)); transform:scale(1.12); }
-    .mb-port.mb-emit { margin:8%; border-radius:10px; border:0; background:var(--c); color:#fff; box-shadow:0 0 16px color-mix(in srgb,var(--c) 70%,transparent); animation:mb-in .35s ease-out; }
+    .mb-port.mb-emit { margin:8%; border-radius:10px; border:0; background:var(--c); color:var(--c-ink); box-shadow:0 0 16px color-mix(in srgb,var(--c) 70%,transparent); animation:mb-in .35s ease-out; }
     @keyframes mb-in { from { transform:scale(.3); opacity:0; } to { transform:scale(1); opacity:1; } }
     .mb-port.mb-right { border:3px solid var(--good) !important; background:color-mix(in srgb,var(--good) 35%,var(--panel-solid)) !important; }
     .mb-port.mb-wrong { border:3px solid var(--bad) !important; background:color-mix(in srgb,var(--bad) 35%,var(--panel-solid)) !important; }

@@ -1,15 +1,16 @@
 // Metadata for all mini games. Game code lives in js/games/<id>.js and is
 // loaded on demand, so the library screen stays tiny.
 //
+// color / dark: subject colour on paper and on the chalkboard (both WCAG AA for text).
 // par: the score a solid adult player reaches; rating = 100 * score / par (capped at 120).
 
 export const CATEGORIES = {
-  math: { name: 'Calculation', color: '#2f6db5', icon: '➗' },
-  memory: { name: 'Memory', color: '#7b52b9', icon: '🧠' },
-  attention: { name: 'Attention', color: '#11867c', icon: '🎯' },
-  speed: { name: 'Speed', color: '#cf731c', icon: '⚡' },
-  spatial: { name: 'Spatial', color: '#4b8b2c', icon: '🧊' },
-  logic: { name: 'Logic & Language', color: '#a5457a', icon: '🧩' },
+  math: { name: 'Calculation', color: '#1e4bd7', dark: '#8fb0ff', icon: '➗' },
+  memory: { name: 'Memory', color: '#b0186f', dark: '#ff8ac6', icon: '🧠' },
+  attention: { name: 'Attention', color: '#0b7a6e', dark: '#4fd1be', icon: '🎯' },
+  speed: { name: 'Speed', color: '#b54a00', dark: '#ffad5c', icon: '⚡' },
+  spatial: { name: 'Spatial', color: '#3a7d12', dark: '#9bdb6a', icon: '🧊' },
+  logic: { name: 'Logic & Language', color: '#3e4e66', dark: '#b7c6db', icon: '🧩' },
 };
 
 export const GAMES = [

@@ -32,7 +32,7 @@ export default function start(api) {
     .bw-grid.bw-live .bw-cell:hover, .bw-cell.bw-cur { border-color:var(--c); box-shadow:inset 0 0 0 2px var(--c); }
     .bw-cell.bw-right { background:color-mix(in srgb,var(--good) 35%,var(--panel-solid)) !important; border-color:var(--good); }
     .bw-cell.bw-wrong { background:color-mix(in srgb,var(--bad) 35%,var(--panel-solid)) !important; border-color:var(--bad); }
-    .bw-start { position:absolute; inset:12%; border-radius:50%; background:var(--c); color:#fff; display:grid; place-items:center;
+    .bw-start { position:absolute; inset:12%; border-radius:50%; background:var(--c); color:var(--c-ink); display:grid; place-items:center;
       font-size:clamp(1rem,5vw,1.6rem); font-weight:900; box-shadow:0 4px 12px color-mix(in srgb,var(--c) 45%,transparent); pointer-events:none; }
     .bw-start span { display:block; transition:transform .25s; }
     .bw-svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }

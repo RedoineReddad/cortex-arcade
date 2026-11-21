@@ -40,7 +40,7 @@ export default function start(api) {
     .wr-pick.miss { border:2px dashed var(--good); color:var(--good); }
     .wr-pick.rej { opacity:.45; }
     .wr-btn {
-      padding:12px 34px; border-radius:99px; border:0; background:var(--c); color:#fff; font-size:1.1rem;
+      padding:12px 34px; border-radius:99px; border:0; background:var(--c); color:var(--c-ink); font-size:1.1rem;
       font-weight:800; cursor:pointer; box-shadow:var(--shadow);
     }
     .wr-btn:active { transform:scale(.96); }

@@ -19,7 +19,7 @@ if (process.env.SHOTS) fs.mkdirSync(new URL('./shots/', import.meta.url), { recu
 
 let failures = 0;
 for (const id of ids) {
-  const page = await browser.newPage({ viewport: { width: 420, height: 860 } });
+  const page = await browser.newPage({ viewport: { width: 420, height: 860 }, colorScheme: process.env.SCHEME || 'light' });
   const errors = [];
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });

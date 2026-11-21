@@ -3,7 +3,7 @@
   "short_name": "Cortex",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f6f8fb",
-  "theme_color": "#f6f8fb",
+  "background_color": "#cdd4de",
+  "theme_color": "#cdd4de",
   "icons": []
 }

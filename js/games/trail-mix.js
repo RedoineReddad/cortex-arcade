@@ -26,7 +26,7 @@ export default function start(api) {
       font-variant-numeric:tabular-nums; z-index:2; touch-action:manipulation; }
     .tm-node.tm-letter { border-style:solid; border-color:color-mix(in srgb, var(--c) 55%, var(--text)); border-radius:30%; }
     .tm-node:active { transform:translate(-50%,-50%) scale(.92); }
-    .tm-node.tm-done { background:var(--c); color:#fff; border-color:var(--c); cursor:default; opacity:.9; }
+    .tm-node.tm-done { background:var(--c); color:var(--c-ink); border-color:var(--c); cursor:default; opacity:.9; }
     .tm-node.tm-last { box-shadow:0 0 0 5px color-mix(in srgb, var(--c) 35%, transparent); }
     .tm-node.tm-wrong { background:color-mix(in srgb, var(--bad) 35%, var(--panel-solid)); border-color:var(--bad); animation:tm-wob .35s; }
     .tm-node.tm-moving { box-shadow:0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent); }
