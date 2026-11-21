@@ -133,7 +133,7 @@ export default function start(api) {
         else if (!sel && real) { miss++; b.classList.add('miss'); }
         else b.classList.add('rej');
       });
-      const pts = Math.max(0, hits * 10 - fa * 8);
+      const pts = Math.max(0, hits * 10 - fa * 12); // a false alarm costs more than a hit earns, so ticking everything never pays
       score += pts; hitsT += hits; faT += fa; missT += miss;
       api.setScore(score);
       if (hits >= N * 0.75 && fa <= 1) api.good(); else if (pts < N * 4) api.bad(); else api.sfx.tick();

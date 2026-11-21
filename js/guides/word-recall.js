@@ -52,7 +52,7 @@ export default {
       say: 'Each word you find scores 10 points and each wrong pick loses 8. Only tap what you really remember.',
       demo: (h) => h('div.tut-row', h('style', CSS),
         h('div.tut-col', word(h, 'apple', '.good'), h('span.tut-note', '+10')),
-        h('div.tut-col', word(h, 'cello', '.bad'), h('span.tut-note', '−8')),
+        h('div.tut-col', word(h, 'cello', '.bad'), h('span.tut-note', '−12')),
         h('div.tut-col', h('div.wr-t-w', { style: { borderStyle: 'dashed', borderColor: 'var(--good)' } }, 'crow'), h('span.tut-muted', 'missed: 0'))),
     },
   ],

@@ -164,7 +164,9 @@ export default function start(api) {
     sw.stop();
     const t = sw.elapsed;
     const extra = Math.max(0, flips - 2 * PAIRS);
-    const score = Math.max(10, Math.round(PAIRS * 25 - extra * 3 - t * 0.5));
+    // Normalised to a 6-pair board so bigger boards (higher levels) don't inflate the score.
+    const k = 6 / PAIRS;
+    const score = Math.max(10, Math.round(150 - extra * 3 * k - t * 0.5 * k));
     api.end({ score, stats: { Flips: String(flips), Time: t.toFixed(1) + 's', Swaps: String(swaps) } });
   }
 

@@ -145,7 +145,8 @@ export function createTeacher({ fixed = true } = {}) {
     let tx, ty;
     if (inGame) {
       // During play he ducks into the bottom-right corner so he never covers the game.
-      tx = innerWidth - size.w * 0.55; ty = innerHeight + size.h * 0.42;
+      // Only his eyes and antennae peek over the bottom edge.
+      tx = innerWidth - size.w * 0.4; ty = innerHeight + size.h * 0.68;
     } else {
       const side = pointer.x > innerWidth - size.w * 1.6 ? -1 : 1;
       tx = pointer.x + side * (size.w * 0.9 + 24);
