@@ -71,7 +71,8 @@ export default {
     {
       say: 'Tap your answer or press 1 to 4. Right answers score more when they are quick, wrong ones cost points.',
       demo: (h) => h('div.tut-row', { style: { maxWidth: '330px' } },
-        ['1  1 h 45 min', '2  2 h 15 min', '3  9 h 45 min', '4  2 h 30 min'].map((t, i) => h('div.tut-box' + (i === 1 ? '.on.tut-tap' : ''), t))),
+        ['1 h 45 min', '2 h 15 min', '9 h 45 min', '2 h 30 min'].map((t, i) => h('div.tut-box' + (i === 1 ? '.on.tut-tap' : ''),
+          h('span', h('small', { style: { opacity: 0.6, marginRight: '6px' } }, String(i + 1)), t)))),
     },
   ],
 };

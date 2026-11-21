@@ -72,7 +72,11 @@ export async function openTutorial(g, onStart) {
     back.style.visibility = i === 0 ? 'hidden' : '';
     next.textContent = i === steps.length - 1 ? 'Start' : 'Next';
   };
+  const onNav = () => finish(false);
+  addEventListener('hashchange', onNav);
   const finish = (start) => {
+    removeEventListener('hashchange', onNav);
+    if (!dlg.isConnected) return;
     prof.destroy();
     dlg.close();
     dlg.remove();

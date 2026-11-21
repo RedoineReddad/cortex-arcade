@@ -10,6 +10,7 @@ const CSS = `
     background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--sheet) 70%, transparent), transparent 28%),
                 radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--br) 6%, var(--sheet)) 50%, color-mix(in srgb, var(--br) 30%, var(--sheet)) 100%);
     border: 2px solid color-mix(in srgb, var(--br) 70%, transparent); }
+  .br-t-bub.short { font-size: 1.3rem; }
   .br-t-bub.bad { border-color: var(--pen); background: color-mix(in srgb, var(--pen) 22%, var(--sheet)); }
   .br-t-bub b { position: absolute; top: -8px; right: -6px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
     font-size: .75rem; background: var(--ink); color: var(--sheet); }
@@ -19,7 +20,7 @@ const CSS = `
   @keyframes br-t-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
   @media (prefers-reduced-motion: reduce) { .br-t-float { animation: none; } }
 `;
-const bub = (h, txt, extra = {}) => h('div.br-t-bub.br-t-float' + (extra.cls || ''),
+const bub = (h, txt, extra = {}) => h('div.br-t-bub.br-t-float' + (txt.length <= 2 ? '.short' : '') + (extra.cls || ''),
   txt, extra.n ? h('b', extra.n) : null, extra.v != null ? h('small', '= ' + extra.v) : null);
 const dir = (h, flip) => h('div.br-t-dir', h('i', flip ? '⬇' : '⬆'), flip ? 'Largest first' : 'Smallest first');
 
@@ -60,8 +61,9 @@ export default {
     },
     {
       say: 'Pop one out of order and all the bubbles come back, so the round starts over. Quick clean rounds earn a speed bonus.',
-      demo: (h) => h('div.br-t.tut-row', h('style', CSS),
-        bub(h, '9', { cls: '.bad' }), h('span.tut-note', 'oops, too big'), h('div.tut-box.good', '+ speed')),
+      demo: (h) => h('div.br-t.tut-col', h('style', CSS),
+        h('div.tut-row', dir(h, false), bub(h, '9', { cls: '.bad' }), h('span.tut-note', 'oops')),
+        h('div.tut-row', h('span.tut-muted', 'clean and quick:'), h('div.tut-box.good', '+ speed bonus'))),
     },
   ],
 };

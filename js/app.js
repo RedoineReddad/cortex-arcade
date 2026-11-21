@@ -20,6 +20,8 @@ const catVars = (c) => ({ '--c-l': CATEGORIES[c].color, '--c-d': CATEGORIES[c].d
 const subj = (g) => catVars(g.cat);
 // Move focus to the main action only for mouse/trackpad users; on touch it would pop the keyboard or scroll.
 const focusMain = (el) => { if (el && matchMedia('(pointer: fine)').matches) el.focus(); };
+// After a game, focus the result sheet itself: an Enter still held from the last answer must not press "Play again".
+const focusSheet = () => { const m = document.getElementById('main'); if (m) { m.setAttribute('tabindex', '-1'); m.focus({ preventScroll: true }); } };
 
 function verdict(r) {
   if (r >= 100) return 'Excellent!';
@@ -237,7 +239,7 @@ function viewResult(g, res, back = '#/') {
       h('div.actions',
         h('button.btn.primary', { type: 'button', onclick: () => runGame(g, { back }) }, 'Play again'),
         h('a.btn.ghost', { href: '#/play/' + next.id }, 'Next: ' + next.title))));
-  focusMain(app.querySelector('.btn.primary'));
+  focusSheet();
   giveTip(g, res);
 }
 
@@ -270,7 +272,7 @@ function viewDaily() {
         h('h2', r.g.title),
         scoreBlock(r),
         h('div.actions', h('button.btn.primary.big', { type: 'button', onclick: () => step(i + 1) }, last ? 'See my brain age' : 'Next exercise'))));
-    focusMain(app.querySelector('.btn.primary'));
+    focusSheet();
     giveTip(r.g, r);
   };
   const finish = () => {

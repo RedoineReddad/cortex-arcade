@@ -85,7 +85,7 @@ export default function start(api) {
   function renderLives() {
     lifeEl.innerHTML = '';
     for (let i = 0; i < 3; i++) lifeEl.append(h('span' + (i < lives ? '' : '.lost'), i < lives ? '♥' : '♡'));
-    api.setInfo(`${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}  ·  ${popped} popped`);
+    api.setInfo(`${popped} popped`); // hearts already show in the sky; keep the HUD short for phones
   }
   renderLives();
   api.setScore(0);

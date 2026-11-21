@@ -145,8 +145,12 @@ export function createTeacher({ fixed = true } = {}) {
     let tx, ty;
     if (inGame) {
       // During play he ducks into the bottom-right corner so he never covers the game.
-      // Only his eyes and antennae peek over the bottom edge.
-      tx = innerWidth - size.w * 0.4; ty = innerHeight + size.h * 0.68;
+      // During play he never covers the game: on wide screens his eyes peek over the bottom edge beside
+      // the stage; on narrower ones he ducks fully out of view.
+      const stage = document.querySelector('.stage').getBoundingClientRect();
+      const room = innerWidth - stage.right;
+      tx = innerWidth - Math.max(size.w * 0.4, room / 2);
+      ty = room > size.w * 0.9 ? innerHeight + size.h * 0.68 : innerHeight + size.h + 20;
     } else {
       const side = pointer.x > innerWidth - size.w * 1.6 ? -1 : 1;
       tx = pointer.x + side * (size.w * 0.9 + 24);
@@ -162,6 +166,17 @@ export function createTeacher({ fixed = true } = {}) {
     root.style.transform = `translate(${(pos.x - size.w / 2).toFixed(1)}px, ${(pos.y - size.h + bob).toFixed(1)}px)`;
   }
 
+  // Keep the speech bubble on screen; its tail stays pointed at the professor.
+  function fitBubble() {
+    if (bubble.hidden) return;
+    bubble.style.setProperty('--shift', '0px');
+    const b = bubble.getBoundingClientRect();
+    let shift = 0;
+    if (b.left < 8) shift = 8 - b.left;
+    else if (b.right > innerWidth - 8) shift = innerWidth - 8 - b.right;
+    bubble.style.setProperty('--shift', shift.toFixed(0) + 'px');
+  }
+
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000);
@@ -169,6 +184,7 @@ export function createTeacher({ fixed = true } = {}) {
     if (document.hidden) return;
     if (fixed) place(dt);
     aim();
+    fitBubble();
   }
 
   // blinking

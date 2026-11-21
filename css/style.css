@@ -83,7 +83,7 @@ h1, h2, h3 { text-wrap: balance; }
 .skip { position: absolute; left: 16px; top: -60px; z-index: 100; min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; background: var(--ink); color: var(--sheet); border-radius: var(--r1); font-weight: 700; }
 .skip:focus { top: 12px; }
 #app { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
-body:has(.stage) #app { padding-bottom: 0; }
+body:has(.stage) #app { padding-bottom: 0; height: 100dvh; display: flex; flex-direction: column; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
@@ -274,7 +274,7 @@ button { font: inherit; color: inherit; }
 .hud-progress { height: 4px; background: var(--edge); border-radius: 2px; overflow: hidden; }
 .hud-progress-bar { height: 100%; width: 0; background: var(--c); transition: width 0.3s; }
 .stage {
-  position: relative; height: calc(100dvh - 72px); min-height: 420px; margin-top: 10px;
+  position: relative; flex: 1 1 auto; min-height: 380px; margin-top: 10px;
   background: var(--sheet); border: 1px solid var(--edge); border-bottom: 0; box-shadow: var(--shadow); border-radius: var(--r1) var(--r1) 0 0; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 16px;
   user-select: none; -webkit-user-select: none; touch-action: manipulation;
@@ -340,10 +340,12 @@ button { font: inherit; color: inherit; }
   .hud { gap: 6px; }
   .hud .back { padding: 0 10px 0 6px; }
   .hud-title small { display: none; }
-  .stage { height: calc(100dvh - 66px); padding: 10px; gap: 10px; }
+  .stage { padding: 10px; gap: 10px; }
   .kp-key { height: 48px; }
 }
 @media (max-width: 440px) {
+  .hud-title { display: none; }
+  .hud-info { max-width: none; flex: 1; }
   .masthead { flex-direction: column; align-items: flex-start; }
   .mast-side { flex-direction: row; align-items: center; width: 100%; }
 }
@@ -389,16 +391,16 @@ button { font: inherit; color: inherit; }
 
 .teacher-bubble {
   pointer-events: auto; cursor: pointer; position: absolute; bottom: 100%; left: 50%;
-  width: max-content; max-width: min(300px, 70vw); margin-bottom: 6px; transform: translateX(-50%);
+  --shift: 0px; width: max-content; max-width: min(300px, calc(100vw - 16px)); margin-bottom: 6px; transform: translateX(calc(-50% + var(--shift)));
   padding: 10px 14px; background: var(--sheet); color: var(--ink); border: 2px solid var(--ink); border-radius: var(--r2);
   font-size: 0.95rem; line-height: 1.35; box-shadow: var(--shadow);
 }
 .teacher-bubble::after {
-  content: ""; position: absolute; top: 100%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  content: ""; position: absolute; top: 100%; left: calc(50% - var(--shift)); width: 12px; height: 12px; margin: -6px 0 0 -6px;
   background: var(--sheet); border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg);
 }
 .teacher-bubble.pop { animation: bannerPopSmall 0.25s ease-out; }
-@keyframes bannerPopSmall { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes bannerPopSmall { from { opacity: 0; } to { opacity: 1; } }
 @keyframes t-wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
 @keyframes t-nod { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-2deg); } }
 @keyframes t-talk { from { transform: scaleY(1); } to { transform: scaleY(1.45); } }
