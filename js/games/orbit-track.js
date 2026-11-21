@@ -237,11 +237,10 @@ export default function start(api) {
     else if (hits >= K / 2) { api.sfx.note(3); api.banner(`${hits}/${K} tracked`, 900); }
     else { api.bad(); api.banner(`${hits}/${K} tracked`, 900); }
     msg.replaceChildren(isPerfect ? '🎯 All tracked!' : `Found ${hits} of ${K}`);
-    // Adapt the number of targets.
-    const prevK = K;
+    // Adapt the number of targets. maxK only counts rounds actually played.
+    maxK = Math.max(maxK, K);
     if (isPerfect) K = Math.min(5, K + 1, N - 3);
     else if (hits / K < 0.5) K = Math.max(2, K - 1);
-    maxK = Math.max(maxK, K);
     api.after(1600, () => {
       if (round >= ROUNDS) {
         api.setProgress(1);
@@ -251,7 +250,7 @@ export default function start(api) {
             'Perfect rounds': `${perfect} / ${ROUNDS}`,
             'Targets found': `${hitsTotal} / ${targetsTotal}`,
             Accuracy: Math.round((100 * hitsTotal) / Math.max(1, targetsTotal)) + '%',
-            'Most targets': String(Math.max(maxK, prevK)),
+            'Most targets': String(maxK),
           },
         });
       } else setupRound();

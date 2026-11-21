@@ -1,14 +1,16 @@
 // Color Clash: Stroop task. Solid frame → answer the INK colour; dashed frame → answer the WORD.
 import { pick, shuffle, clamp } from '../core/util.js';
 
+// Ink colours per theme: c = paper (light), d = chalkboard (dark), so the word stays readable in both.
 const COLORS = [
-  { n: 'RED', c: '#e11d2e' },
-  { n: 'BLUE', c: '#2f6df6' },
-  { n: 'GREEN', c: '#16a34a' },
-  { n: 'YELLOW', c: '#eab308' },
-  { n: 'PURPLE', c: '#9333ea' },
-  { n: 'ORANGE', c: '#f97316' },
+  { n: 'RED', c: '#dc1f2d', d: '#ff5c61' },
+  { n: 'BLUE', c: '#2563eb', d: '#6e9eff' },
+  { n: 'GREEN', c: '#15803d', d: '#4ade80' },
+  { n: 'YELLOW', c: '#d29b00', d: '#facc15' },
+  { n: 'PURPLE', c: '#9333ea', d: '#c58cff' },
+  { n: 'ORANGE', c: '#ea580c', d: '#fb923c' },
 ];
+const inkVars = (col) => ({ '--cl-l': col.c, '--cl-d': col.d });
 
 export default function start(api) {
   const { h, level } = api;
@@ -49,6 +51,10 @@ export default function start(api) {
     .cl-btn { display: flex; align-items: center; gap: 10px; padding: 12px 12px; font-size: 1.05rem; position: relative; justify-content: flex-start; }
     .cl-sw { width: 30px; height: 30px; border-radius: 50%; flex: none; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 0 0 2px color-mix(in srgb, var(--text) 15%, transparent); }
     .cl-key { position: absolute; top: 4px; right: 8px; font-size: .7rem; color: var(--muted); font-weight: 600; }
+    .cl-word-txt, .cl-sw { --cl: var(--cl-l); }
+    .cl-word-txt { color: var(--cl); }
+    .cl-sw { background: var(--cl); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cl-word-txt, :root:not([data-theme="light"]) .cl-sw { --cl: var(--cl-d); } }
     @media (max-width: 400px) { .cl-btn { font-size: .9rem; gap: 7px; padding: 12px 8px; } .cl-sw { width: 24px; height: 24px; } }
   `);
 
@@ -67,7 +73,7 @@ export default function start(api) {
     btnGrid.replaceChildren();
     buttons = order.map((col, i) => {
       const b = h('button.choice.cl-btn', { type: 'button', onpointerdown: (e) => { e.preventDefault(); answer(i, e); } },
-        h('span.cl-sw', { style: { background: col.c } }), col.n, h('span.cl-key', String(i + 1)));
+        h('span.cl-sw', { style: inkVars(col) }), col.n, h('span.cl-key', String(i + 1)));
       btnGrid.append(b);
       return b;
     });
@@ -95,7 +101,8 @@ export default function start(api) {
     card.classList.toggle('cl-word', mode === 'word');
     modeTag.textContent = mode === 'ink' ? '🎨 INK colour' : '💬 WORD meaning';
     wordTxt.textContent = word.n;
-    wordTxt.style.color = ink.c;
+    wordTxt.style.setProperty('--cl-l', ink.c);
+    wordTxt.style.setProperty('--cl-d', ink.d);
     card.classList.remove('cl-pop'); void card.offsetWidth; card.classList.add('cl-pop');
     locked = false;
   }

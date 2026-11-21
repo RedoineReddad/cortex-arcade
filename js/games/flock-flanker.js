@@ -129,7 +129,8 @@ export default function start(api) {
     locked = false;
     if (trial.dusk) {
       const [vx, vy] = VEC[trial.move];
-      const span = 150, start = -55;
+      // Symmetric sweep so the widest formation (±128 plus a bird) never leaves the 400-wide view.
+      const span = 60, start = -60;
       drift && drift.stop();
       drift = api.loop((dt, el) => {
         if (locked || api.ended) return false;

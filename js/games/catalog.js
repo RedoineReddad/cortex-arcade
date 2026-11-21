@@ -102,7 +102,7 @@ export const GAMES = [
     howto: ['Compare each card with the one N cards back.', 'Check the cue: shape or colour?', 'Tap Match or No match.'],
   },
   {
-    id: 'signal-sprint', title: 'Signal Sprint', cat: 'attention', icon: '🚦', par: 240,
+    id: 'signal-sprint', title: 'Signal Sprint', cat: 'attention', icon: '🚦', par: 200,
     blurb: 'Tap the green signals fast and leave the red ones alone.',
     twist: 'When the screen turns purple the rule flips: tap red and leave green alone.',
     howto: ['Normally: tap GREEN, ignore RED.', 'Purple screen: tap RED, ignore GREEN.', 'Speed counts.'],

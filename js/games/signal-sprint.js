@@ -35,6 +35,7 @@ export default function start(api) {
     @keyframes ssHit { to { transform: scale(1.5); opacity: 0; } }
     .ss-hint { font-size: .85rem; }
     .banner.ss-banner { border-color: #a855f7; color: #a855f7; }
+    @media (max-width: 480px) { .banner.ss-bn { font-size: 1.1rem; padding: 10px 14px; } }
   `);
 
   const rule = h('div.ss-rule');
@@ -55,9 +56,12 @@ export default function start(api) {
   }
   renderRule();
 
-  let lastPos = null;
+  let lastPos = null, quietUntil = 0;
   function spawn() {
     if (api.ended) return;
+    // Keep the arena clear while the rule-flip banner is up.
+    const wait = quietUntil - performance.now();
+    if (wait > 0) { api.after(wait, spawn); return; }
     const r = Math.random();
     let color;
     const go = flipped ? 'red' : 'green', no = flipped ? 'green' : 'red';
@@ -128,7 +132,8 @@ export default function start(api) {
       api.bad(x, y);
     }
     api.setScore(score);
-    scheduleNext();
+    // A false tap must not bring the next signal sooner than waiting would have.
+    scheduleNext(sig.isGo ? 0 : Math.max(0, showMs - rt));
   }
 
   api.keys({ ' ': () => tap(cur) });
@@ -137,9 +142,10 @@ export default function start(api) {
   function scheduleFlip() {
     api.after(flipped ? rand(5000, 8000) : rand(8000, 12000), () => {
       flipped = !flipped;
+      quietUntil = performance.now() + 1100;
       if (cur) { const s = cur; removeSig(s, 'ss-gone'); scheduleNext(500); }
       renderRule();
-      const b = api.banner(flipped ? '🔄 RULE FLIP! Tap RED' : '✅ Back to normal: tap GREEN', 1100);
+      const b = api.banner(flipped ? '🔄 RULE FLIP! Tap RED' : '✅ Normal: tap GREEN', 1100, 'ss-bn');
       if (flipped) b.classList.add('ss-banner');
       api.sfx.note(flipped ? 7 : 2);
       scheduleFlip();

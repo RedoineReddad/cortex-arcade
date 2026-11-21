@@ -262,7 +262,7 @@ button { font: inherit; color: inherit; }
 /* ── Game screen ───────────────────────────────────── */
 .hud { display: flex; align-items: center; gap: 12px; padding: 10px 0 8px; }
 .hud .back { padding-right: 8px; }
-.hud-title { flex: 1; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-title { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hud-title small { color: var(--c); margin-left: 8px; font-size: 0.85rem; }
 .hud-time, .hud-score, .hud-info {
   min-width: 56px; min-height: 44px; display: grid; place-items: center; padding: 0 10px; border: 2px solid var(--ink); border-radius: var(--r1);
@@ -336,7 +336,9 @@ button { font: inherit; color: inherit; }
   .stats-page .sheet { padding: 20px 16px 20px 40px; }
   .stats-page .sheet::before { left: 26px; }
   .margin-note { margin-left: 0; }
-  .hud-info { display: none; }
+  .hud-info { max-width: 30vw; padding: 0 6px; font-size: 0.85rem; }
+  .hud { gap: 6px; }
+  .hud .back { padding: 0 10px 0 6px; }
   .hud-title small { display: none; }
   .stage { height: calc(100dvh - 66px); padding: 10px; gap: 10px; }
   .kp-key { height: 48px; }
