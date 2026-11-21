@@ -374,15 +374,15 @@ button { font: inherit; color: inherit; }
 .teacher .t-glass { fill: none; stroke: #2a2f36; stroke-width: 2.6; }
 .teacher .t-bobble { fill: #ffad5c; stroke: #2a2f36; stroke-width: 2; }
 .teacher .t-teeth { fill: #fff; stroke: #2a2f36; stroke-width: 1.4; }
-.teacher .t-mouth-open { fill: #5a2230; stroke: #2a2f36; stroke-width: 2; opacity: 0; }
+.teacher .t-mouth-open { fill: #5a2230; stroke: #2a2f36; stroke-width: 2.2; stroke-linejoin: round; }
+.teacher .t-mouth { transform-box: fill-box; transform-origin: 50% 0; }
+.teacher .t-claw { stroke: #2a2f36; stroke-width: 1.8; stroke-linecap: round; }
 .teacher .t-stick { stroke: #8a5a2b; stroke-width: 3.4; stroke-linecap: round; }
 .teacher .t-stick-tip { fill: #cc1f2a; }
 .teacher .t-arm { transition: transform 0.15s ease-out; }
 .teacher .t-antennae { transform-box: fill-box; transform-origin: 50% 100%; animation: t-wobble 2.6s ease-in-out infinite; }
 .teacher .t-head { transform-box: fill-box; transform-origin: 50% 100%; animation: t-nod 4s ease-in-out infinite; }
-.teacher.talking .t-mouth-open { animation: t-talk 0.22s steps(2) infinite; }
-.teacher.talking .t-mouth-shut { opacity: 0; }
-.teacher.talking .t-mouth-open { opacity: 1; }
+.teacher.talking .t-mouth { animation: t-talk 0.24s ease-in-out infinite alternate; }
 .teacher.peek .teacher-bubble { display: none; }
 
 .teacher-bubble {
@@ -399,7 +399,7 @@ button { font: inherit; color: inherit; }
 @keyframes bannerPopSmall { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%); } }
 @keyframes t-wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
 @keyframes t-nod { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-2deg); } }
-@keyframes t-talk { to { transform: scaleY(0.4); } }
+@keyframes t-talk { from { transform: scaleY(1); } to { transform: scaleY(1.45); } }
 @media (prefers-reduced-motion: reduce) { .teacher .t-antennae, .teacher .t-head { animation: none; } }
 
 /* ── Tutorial dialog ───────────────────────────────────────────────── */
