@@ -1,4 +1,5 @@
 node_modules/
-tests/shots/
+dist/
+*.tsbuildinfo
 .DS_Store
-cortex-arcade.zip
+shots/
